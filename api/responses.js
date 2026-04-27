@@ -1,7 +1,7 @@
 // Vercel serverless function for SUS survey responses
 // Handles GET (fetch all), POST (submit), DELETE (clear all)
 
-import { neon } from '@neondatabase/serverless';
+const { neon } = require('@neondatabase/serverless');
 
 function getSQL() {
   const connStr = process.env.POSTGRES_URL || process.env.DATABASE_URL;
@@ -52,7 +52,7 @@ function isFlagged(ea_usage) {
   return ea_usage === 'Yes (EA did it for me)';
 }
 
-export default async function handler(req, res) {
+module.exports = async function handler(req, res) {
   // Enable CORS for local dev and production
   res.setHeader('Access-Control-Allow-Credentials', 'true');
   res.setHeader('Access-Control-Allow-Origin', '*');
