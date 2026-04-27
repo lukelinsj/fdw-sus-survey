@@ -414,9 +414,9 @@ function populateFilterOptions(responses) {
     });
     sel.value = current;
   };
-  fill('filterResidency', responses.map(r => r.screener.residency));
-  fill('filterScheme', responses.map(r => r.screener.scheme));
-  fill('filterEA', responses.map(r => r.screener.ea_used));
+  fill('filterResidency', responses.map(r => r.screener.residency_status));
+  fill('filterScheme', responses.map(r => r.screener.application_scheme));
+  fill('filterEA', responses.map(r => r.screener.ea_usage));
 }
 function applyFilters(all) {
   const fR = document.getElementById('filterResidency').value;
@@ -424,10 +424,10 @@ function applyFilters(all) {
   const fE = document.getElementById('filterEA').value;
   const fV = document.getElementById('filterValidity').value;
   return all.filter(r => {
-    if (fR && r.screener.residency !== fR) return false;
-    if (fS && r.screener.scheme !== fS) return false;
-    if (fE && r.screener.ea_used !== fE) return false;
-    const flagged = r.screener.ea_used === 'Yes (EA did it for me)';
+    if (fR && r.screener.residency_status !== fR) return false;
+    if (fS && r.screener.application_scheme !== fS) return false;
+    if (fE && r.screener.ea_usage !== fE) return false;
+    const flagged = r.screener.ea_usage === 'Yes (EA did it for me)';
     if (fV === 'valid' && flagged) return false;
     if (fV === 'flagged' && !flagged) return false;
     return true;
@@ -472,7 +472,7 @@ async function renderDashboard() {
   filtered.forEach(r => gradeCounts[gradeFor(r.sus_score).letter]++);
 
   const itemAvgs = SUS_ITEMS.map(item => {
-    const responses = filtered.map(r => r.sus_responses[`Q${item.id}`]);
+    const responses = filtered.map(r => r.sus_responses[`sus${item.id}`]);
     return {
       ...item,
       avgResp: avg(responses),
@@ -487,7 +487,7 @@ async function renderDashboard() {
   };
 
   const overallGrade = gradeFor(meanScore);
-  const flaggedCount = filtered.filter(r => r.screener.ea_used === 'Yes (EA did it for me)').length;
+  const flaggedCount = filtered.filter(r => r.screener.ea_usage === 'Yes (EA did it for me)').length;
 
   content.innerHTML = `
     <div class="stats-grid">
@@ -555,15 +555,15 @@ async function renderDashboard() {
         <div style="display:grid;grid-template-columns:1fr;gap:14px;">
           <div>
             <div style="font-size:11px;color:var(--muted);margin-bottom:4px;font-weight:600;text-transform:uppercase;letter-spacing:.05em;">Residency</div>
-            <table class="dist-table">${Object.entries(dist('residency')).map(([k,v]) => `<tr><td>${k}</td><td class="num">${v}</td></tr>`).join('')}</table>
+            <table class="dist-table">${Object.entries(dist('residency_status')).map(([k,v]) => `<tr><td>${k}</td><td class="num">${v}</td></tr>`).join('')}</table>
           </div>
           <div>
             <div style="font-size:11px;color:var(--muted);margin-bottom:4px;font-weight:600;text-transform:uppercase;letter-spacing:.05em;">Scheme</div>
-            <table class="dist-table">${Object.entries(dist('scheme')).map(([k,v]) => `<tr><td>${k}</td><td class="num">${v}</td></tr>`).join('')}</table>
+            <table class="dist-table">${Object.entries(dist('application_scheme')).map(([k,v]) => `<tr><td>${k}</td><td class="num">${v}</td></tr>`).join('')}</table>
           </div>
           <div>
             <div style="font-size:11px;color:var(--muted);margin-bottom:4px;font-weight:600;text-transform:uppercase;letter-spacing:.05em;">EA usage</div>
-            <table class="dist-table">${Object.entries(dist('ea_used')).map(([k,v]) => `<tr><td>${k}</td><td class="num">${v}</td></tr>`).join('')}</table>
+            <table class="dist-table">${Object.entries(dist('ea_usage')).map(([k,v]) => `<tr><td>${k}</td><td class="num">${v}</td></tr>`).join('')}</table>
           </div>
         </div>
       </div>
@@ -627,20 +627,20 @@ async function renderDashboard() {
             <tbody>
               ${pageRows.map(r => {
                 const g = gradeFor(r.sus_score);
-                const flagged = r.screener.ea_used === 'Yes (EA did it for me)';
-                const name = r.contact?.full_name || '—';
-                const email = r.contact?.email || '—';
-                const phone = r.contact?.phone || '—';
+                const flagged = r.screener.ea_usage === 'Yes (EA did it for me)';
+                const name = r.contact_info?.full_name || '—';
+                const email = r.contact_info?.email || '—';
+                const phone = r.contact_info?.contact || '—';
                 return `
                   <tr>
                     <td>${new Date(r.timestamp).toLocaleString()}</td>
                     <td>${name}</td>
                     <td>${email}</td>
                     <td>${phone}</td>
-                    <td>${r.screener.residency}</td>
-                    <td>${r.screener.scheme}</td>
-                    <td>${r.screener.ea_used}</td>
-                    ${SUS_ITEMS.map(i => `<td class="num">${r.sus_responses[`Q${i.id}`]}</td>`).join('')}
+                    <td>${r.screener.residency_status}</td>
+                    <td>${r.screener.application_scheme}</td>
+                    <td>${r.screener.ea_usage}</td>
+                    ${SUS_ITEMS.map(i => `<td class="num">${r.sus_responses[`sus${i.id}`]}</td>`).join('')}
                     <td class="num"><strong>${r.sus_score.toFixed(1)}</strong></td>
                     <td class="${g.cls}">${g.letter}</td>
                     <td>${flagged ? '<span class="flag-pill">flagged</span>' : 'OK'}</td>
@@ -689,9 +689,9 @@ document.getElementById('exportAllCsvBtn').addEventListener('click', async () =>
   const escape = v => `"${String(v ?? '').replace(/"/g,'""')}"`;
   const rows = all.map(r => [
     r.id, r.timestamp,
-    r.contact?.full_name || '', r.contact?.email || '', r.contact?.phone || '',
-    r.screener.residency, r.screener.scheme, r.screener.ea_used,
-    ...SUS_ITEMS.map(i => r.sus_responses[`Q${i.id}`]),
+    r.contact_info?.full_name || '', r.contact_info?.email || '', r.contact_info?.contact || '',
+    r.screener.residency_status, r.screener.application_scheme, r.screener.ea_usage,
+    ...SUS_ITEMS.map(i => r.sus_responses[`sus${i.id}`]),
     r.sus_score, gradeFor(r.sus_score).letter, r.validity_flag
   ]);
   const csv = [headers.map(escape).join(','), ...rows.map(row => row.map(escape).join(','))].join('\n');
