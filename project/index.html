@@ -533,27 +533,31 @@ function calculateSUS(responses) {
   return Math.round(total * 2.5 * 10) / 10;
 }
 
-/* Storage (shared with researcher dashboard via same key) */
-const STORAGE_KEY = 'fdw_sus_responses_v1';
+/* Storage (Neon database via Vercel serverless API) */
 const SUBMITTED_KEY = 'fdw_sus_submitted_v1';
-function saveResponse(record) {
-  let all = [];
-  try { all = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]'); } catch(e){}
-  if (!Array.isArray(all)) all = [];
-  all.push({ ...record, id: 'r_' + Date.now() + '_' + Math.random().toString(36).slice(2,7) });
+async function saveResponse(record) {
   try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(all));
+    const response = await fetch('/api/responses', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(record)
+    });
+    if (!response.ok) {
+      const err = await response.json().catch(() => ({}));
+      return { ok: false, error: err.error || 'server_error' };
+    }
+    const result = await response.json();
+    // Mark as submitted locally (prevent duplicate submissions from same browser)
     localStorage.setItem(SUBMITTED_KEY, new Date().toISOString());
-    return { ok: true };
+    return { ok: true, id: result.id };
   } catch (err) {
-    // QuotaExceededError — localStorage is typically capped at 5–10 MB per origin.
-    // At ~700 bytes/response, that's roughly 7,000–14,000 responses before this triggers.
-    return { ok: false, error: 'storage_full' };
+    console.error('Save error:', err);
+    return { ok: false, error: 'network_error' };
   }
 }
 
 /* Submit */
-document.getElementById('susForm').addEventListener('submit', (e) => {
+document.getElementById('susForm').addEventListener('submit', async (e) => {
   e.preventDefault();
   if (isPreviewMode) {
     alert('Preview mode: submissions are disabled. Open the survey without ?preview=1 to record a real response.');
@@ -578,20 +582,30 @@ document.getElementById('susForm').addEventListener('submit', (e) => {
   const responses = {};
   RADIO_NAMES.forEach(n => responses[n] = data.get(n));
   TEXT_NAMES.forEach(n => responses[n] = (data.get(n) || '').toString().trim());
-  const score = calculateSUS(responses);
 
   const record = {
-    timestamp: new Date().toISOString(),
-    contact: { full_name: responses.full_name, email: responses.email, phone: responses.contact },
-    screener: { residency: responses.residency, scheme: responses.scheme, ea_used: responses.ea },
-    sus_responses: Object.fromEntries(SUS_ITEMS.map(i => [`Q${i.id}`, Number(responses[`sus${i.id}`])])),
-    sus_score: score,
-    validity_flag: responses.ea === 'Yes (EA did it for me)' ? 'EA-completed — direct system interaction may be insufficient' : 'OK'
+    contact_info: {
+      full_name: responses.full_name,
+      email: responses.email,
+      contact: responses.contact
+    },
+    screener: {
+      residency_status: responses.residency,
+      application_scheme: responses.scheme,
+      ea_usage: responses.ea
+    },
+    sus_responses: Object.fromEntries(SUS_ITEMS.map(i => [`sus${i.id}`, Number(responses[`sus${i.id}`])]))
   };
-  const saveResult = saveResponse(record);
+
+  const sm = document.getElementById('statusMsg');
+  sm.textContent = 'Submitting...';
+  sm.classList.remove('error');
+
+  const saveResult = await saveResponse(record);
   if (!saveResult.ok) {
-    const sm = document.getElementById('statusMsg');
-    sm.textContent = 'Sorry — we could not save your response. The system is at capacity. Please contact the researcher.';
+    sm.textContent = saveResult.error === 'network_error'
+      ? 'Network error — please check your connection and try again.'
+      : 'Sorry — we could not save your response. Please contact the researcher.';
     sm.classList.add('error');
     return;
   }

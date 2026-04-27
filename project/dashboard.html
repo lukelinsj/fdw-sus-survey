@@ -419,22 +419,43 @@ document.getElementById('gatePassphrase').addEventListener('keydown', (e) => {
   if (e.key === 'Enter') document.getElementById('gateBtn').click();
 });
 
-/* ---------- Data ---------- */
-// In-memory cache so we don't re-parse 3.5MB of JSON on every filter change.
+/* ---------- Data (Neon database via Vercel serverless API) ---------- */
+// In-memory cache so we don't re-fetch on every filter change.
 // Invalidated when we know writes happened (currently: clear, seed demo data).
 let _responsesCache = null;
-function loadResponses() {
+async function loadResponses() {
   if (_responsesCache) return _responsesCache;
   try {
-    const data = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+    const response = await fetch('/api/responses');
+    if (!response.ok) {
+      console.error('Failed to fetch responses:', response.status);
+      _responsesCache = [];
+      return _responsesCache;
+    }
+    const data = await response.json();
     if (!Array.isArray(data)) { _responsesCache = []; return _responsesCache; }
-    // Filter out any malformed records (e.g. from older versions or test probes)
+    // Filter out any malformed records
     _responsesCache = data.filter(r => r && r.screener && r.sus_responses && typeof r.sus_score === 'number');
     return _responsesCache;
-  } catch (e) { _responsesCache = []; return _responsesCache; }
+  } catch (e) {
+    console.error('Load error:', e);
+    _responsesCache = [];
+    return _responsesCache;
+  }
 }
 function invalidateResponsesCache() { _responsesCache = null; }
-function clearResponses() { localStorage.removeItem(STORAGE_KEY); invalidateResponsesCache(); }
+async function clearResponses() {
+  try {
+    const response = await fetch('/api/responses', { method: 'DELETE' });
+    if (!response.ok) throw new Error('Delete failed');
+    invalidateResponsesCache();
+    // Also clear the participant submission lockout
+    localStorage.removeItem('fdw_sus_submitted_v1');
+  } catch (e) {
+    console.error('Clear error:', e);
+    throw e;
+  }
+}
 
 /* ---------- Math ---------- */
 const avg = nums => nums.length ? nums.reduce((a,b)=>a+b,0) / nums.length : 0;
@@ -498,8 +519,8 @@ const PAGE_SIZE = 100;
 let currentPage = 1;
 
 /* ---------- Render ---------- */
-function renderDashboard() {
-  const all = loadResponses();
+async function renderDashboard() {
+  const all = await loadResponses();
   populateFilterOptions(all);
   const filtered = applyFilters(all);
 
@@ -766,7 +787,7 @@ document.getElementById('exportAllCsvBtn').addEventListener('click', () => {
 document.getElementById('printReportBtn').addEventListener('click', () => window.print());
 
 /* ---------- Clear ---------- */
-document.getElementById('clearAllBtn').addEventListener('click', (e) => {
+document.getElementById('clearAllBtn').addEventListener('click', async (e) => {
   const btn = e.currentTarget;
   if (btn.dataset.confirming !== '1') {
     btn.dataset.confirming = '1';
@@ -778,63 +799,22 @@ document.getElementById('clearAllBtn').addEventListener('click', (e) => {
     return;
   }
   btn.dataset.confirming = '0';
-  btn.textContent = 'Clear all responses';
-  clearResponses();
-  // Also clear the participant submission lockout so the same browser can re-test
-  localStorage.removeItem('fdw_sus_submitted_v1');
-  renderDashboard();
+  btn.textContent = 'Clearing...';
+  btn.disabled = true;
+  try {
+    await clearResponses();
+    btn.textContent = 'Clear all responses';
+    await renderDashboard();
+  } catch (err) {
+    btn.textContent = 'Clear failed — retry?';
+  } finally {
+    btn.disabled = false;
+  }
 });
 
-/* ---------- Demo data ---------- */
+/* ---------- Demo data (disabled when using Neon database) ---------- */
 document.getElementById('seedBtn').addEventListener('click', (e) => {
-  const btn = e.currentTarget;
-  if (btn.dataset.confirming !== '1') {
-    const original = btn.textContent;
-    btn.dataset.confirming = '1';
-    btn.textContent = 'Click again to add 12 demo responses';
-    btn.style.borderColor = 'var(--accent)';
-    btn.style.color = 'var(--accent)';
-    setTimeout(() => {
-      btn.dataset.confirming = '0';
-      btn.textContent = original;
-      btn.style.borderColor = '';
-      btn.style.color = '';
-    }, 3500);
-    return;
-  }
-  btn.dataset.confirming = '0';
-  btn.textContent = 'Add demo data';
-  btn.style.borderColor = '';
-  btn.style.color = '';
-  const residencies = ['Singapore Citizen','Permanent Resident','Foreigner (EP/SP/DP)'];
-  const schemes = ['Standard','Joint Income','Sponsorship'];
-  const eas = ['No (Self-Applied)','Mixed','Yes (EA did it for me)'];
-  const all = loadResponses();
-  for (let i = 0; i < 12; i++) {
-    const sus = {};
-    let total = 0;
-    SUS_ITEMS.forEach(item => {
-      const v = 1 + Math.floor(Math.random() * 5);
-      sus[`Q${item.id}`] = v;
-      total += item.id % 2 === 1 ? v - 1 : 5 - v;
-    });
-    const ea = eas[Math.floor(Math.random()*eas.length)];
-    all.push({
-      id: 'demo_' + Date.now() + '_' + i,
-      timestamp: new Date(Date.now() - Math.random()*30*86400000).toISOString(),
-      screener: {
-        residency: residencies[Math.floor(Math.random()*residencies.length)],
-        scheme: schemes[Math.floor(Math.random()*schemes.length)],
-        ea_used: ea
-      },
-      sus_responses: sus,
-      sus_score: Math.round(total * 2.5 * 10) / 10,
-      validity_flag: ea === 'Yes (EA did it for me)' ? 'EA-completed — direct system interaction may be insufficient' : 'OK'
-    });
-  }
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(all));
-  invalidateResponsesCache();
-  renderDashboard();
+  alert('Demo data seeding is disabled when using the Neon database. Submit test responses via the participant survey instead.');
 });
 
 /* ---------- Auto-unlock if previously authed ---------- */
