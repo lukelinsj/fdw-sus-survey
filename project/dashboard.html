@@ -20,8 +20,8 @@
     --ok-border: #9ec6a3;
     --bad-bg: #fbeaea;
     --bad-border: #d99a9a;
-    --radius: 6px;
-    --maxw: 1100px;
+    --radius: 8px;
+    --maxw: 1140px;
   }
   * { box-sizing: border-box; }
   html, body { margin: 0; padding: 0; }
@@ -33,7 +33,7 @@
     line-height: 1.5;
     -webkit-font-smoothing: antialiased;
   }
-  .wrap { max-width: var(--maxw); margin: 0 auto; padding: 32px 24px 80px; }
+  .wrap { max-width: var(--maxw); margin: 0 auto; padding: 32px 28px 80px; }
   header.top { border-bottom: 1px solid var(--line); padding-bottom: 18px; margin-bottom: 24px; display: flex; justify-content: space-between; align-items: flex-end; gap: 16px; flex-wrap: wrap; }
   header.top h1 { font-size: 22px; margin: 0 0 4px; font-weight: 600; letter-spacing: -0.01em; }
   header.top .sub { color: var(--muted); font-size: 14px; }
@@ -42,12 +42,13 @@
   header.top a.survey-link:hover { background: var(--surface); }
 
   /* Auth gate */
-  .gate { max-width: 420px; margin: 80px auto; background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 32px; }
+  .gate { max-width: 440px; margin: 80px auto; background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 36px 32px; }
   .gate h2 { margin: 0 0 6px; font-size: 18px; font-weight: 600; }
   .gate p { color: var(--muted); font-size: 14px; margin: 0 0 20px; }
-  .gate sgds-input { margin-bottom: 12px; }
-  .gate sgds-alert { margin-bottom: 10px; }
-  .gate sgds-button { width: 100%; }
+  .gate sgds-input { display: block; margin-bottom: 12px; }
+  .gate .gate-error { margin-bottom: 10px; }
+  .gate .gate-error[hidden] { display: none; }
+  .gate .gate-submit { display: block; width: 100%; }
   .gate .hint { font-size: 12px; color: var(--muted); text-align: center; margin-top: 14px; }
 
   .dashboard { display: none; }
@@ -160,7 +161,8 @@
   }
 
   @media (max-width: 600px) {
-    .wrap { padding: 20px 14px 60px; }
+    .wrap { padding: 20px 16px 60px; }
+    .gate { margin: 40px auto; padding: 28px 20px; }
   }
 </style>
 </head>
@@ -176,8 +178,10 @@
     <p>This dashboard is for authorised MOM researchers only. Sign in with your <code>@mom.gov.sg</code> email to continue.</p>
     <sgds-input type="email" id="gateEmail" label="Email" placeholder="name@mom.gov.sg"></sgds-input>
     <sgds-input type="password" id="gatePassphrase" label="Passphrase" placeholder="Passphrase"></sgds-input>
-    <sgds-alert variant="danger" id="gateErr"></sgds-alert>
-    <sgds-button variant="primary" id="gateBtn">Unlock dashboard</sgds-button>
+    <div class="gate-error" id="gateErrWrap" hidden>
+      <sgds-alert variant="danger" show id="gateErr"></sgds-alert>
+    </div>
+    <sgds-button variant="primary" id="gateBtn" class="gate-submit">Unlock dashboard</sgds-button>
     <div class="hint">Prototype passphrase: <code>research</code></div>
   </div>
 
@@ -281,26 +285,25 @@ function lockDashboard() {
   document.getElementById('gateScreen').style.display = 'block';
   document.getElementById('gateEmail').value = '';
   document.getElementById('gatePassphrase').value = '';
-  const errEl = document.getElementById('gateErr');
-  errEl.show = false;
-  errEl.textContent = '';
+  document.getElementById('gateErrWrap').hidden = true;
+  document.getElementById('gateErr').textContent = '';
 }
 
-document.getElementById('gateBtn').addEventListener('click', () => {
+function handleGateSubmit() {
   const v = document.getElementById('gateEmail').value;
   const p = document.getElementById('gatePassphrase').value;
   const result = tryUnlock(v, p);
   if (!result.ok) {
-    const errEl = document.getElementById('gateErr');
-    errEl.textContent = result.error;
-    errEl.show = true;
+    document.getElementById('gateErr').textContent = result.error;
+    document.getElementById('gateErrWrap').hidden = false;
   }
-});
-document.getElementById('gateEmail').addEventListener('keydown', (e) => {
-  if (e.key === 'Enter') document.getElementById('gateBtn').click();
-});
-document.getElementById('gatePassphrase').addEventListener('keydown', (e) => {
-  if (e.key === 'Enter') document.getElementById('gateBtn').click();
+}
+
+document.getElementById('gateBtn').addEventListener('click', handleGateSubmit);
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Enter' && document.getElementById('gateScreen').style.display !== 'none') {
+    handleGateSubmit();
+  }
 });
 
 /* ---------- Data (Neon database via Vercel serverless API) ---------- */
@@ -629,10 +632,10 @@ async function renderDashboard() {
 });
 
 /* ---------- Pagination clicks (delegated, since buttons are re-rendered) ---------- */
-document.getElementById('dashContent').addEventListener('click', (e) => {
+document.getElementById('dashContent').addEventListener('click', async (e) => {
   const btn = e.target.closest('button[data-page]');
   if (!btn) return;
-  const all = loadResponses();
+  const all = await loadResponses();
   const filteredCount = applyFilters(all).length;
   const totalPages = Math.max(1, Math.ceil(filteredCount / PAGE_SIZE));
   const action = btn.dataset.page;
@@ -644,8 +647,8 @@ document.getElementById('dashContent').addEventListener('click', (e) => {
 });
 
 /* ---------- Export CSV ---------- */
-document.getElementById('exportAllCsvBtn').addEventListener('click', () => {
-  const all = applyFilters(loadResponses());
+document.getElementById('exportAllCsvBtn').addEventListener('click', async () => {
+  const all = applyFilters(await loadResponses());
   if (!all.length) { alert('No responses to export.'); return; }
   const headers = ['id','timestamp','full_name','email','mobile','residency','scheme','ea_used',
     ...SUS_ITEMS.map(i => `Q${i.id}: ${i.text}`),
