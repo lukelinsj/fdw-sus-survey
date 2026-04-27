@@ -20,8 +20,18 @@
     --ok-border: #9ec6a3;
     --bad-bg: #fbeaea;
     --bad-border: #d99a9a;
-    --radius: 6px;
-    --maxw: 1100px;
+    --radius: 8px;
+    --maxw: 1168px;
+
+    --sgds-product-primary-100: #e8eef7;
+    --sgds-product-primary-200: #c5d5eb;
+    --sgds-product-primary-300: #8aadd4;
+    --sgds-product-primary-400: #5589c0;
+    --sgds-product-primary-500: #3a6fad;
+    --sgds-product-primary-600: #2b5fa6;
+    --sgds-product-primary-700: #224b85;
+    --sgds-product-primary-800: #1a3a67;
+    --sgds-product-primary-900: #122a4a;
   }
   * { box-sizing: border-box; }
   html, body { margin: 0; padding: 0; }
@@ -33,27 +43,22 @@
     line-height: 1.5;
     -webkit-font-smoothing: antialiased;
   }
-  .wrap { max-width: var(--maxw); margin: 0 auto; padding: 32px 24px 80px; }
+  .wrap { max-width: var(--maxw); margin: 0 auto; padding: 32px 28px 80px; }
   header.top { border-bottom: 1px solid var(--line); padding-bottom: 18px; margin-bottom: 24px; display: flex; justify-content: space-between; align-items: flex-end; gap: 16px; flex-wrap: wrap; }
   header.top h1 { font-size: 22px; margin: 0 0 4px; font-weight: 600; letter-spacing: -0.01em; }
   header.top .sub { color: var(--muted); font-size: 14px; }
-  header.top .badge {
-    font-size: 11px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--accent);
-    background: var(--accent-soft); padding: 4px 10px; border-radius: 999px; font-weight: 600;
-    display: inline-block; margin-bottom: 8px;
-  }
+  header.top sgds-badge { margin-bottom: 8px; display: inline-block; }
   header.top a.survey-link { font-size: 13px; color: var(--muted); text-decoration: none; border: 1px solid var(--line-strong); padding: 6px 12px; border-radius: var(--radius); }
   header.top a.survey-link:hover { background: var(--surface); }
 
   /* Auth gate */
-  .gate { max-width: 420px; margin: 80px auto; background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 32px; }
+  .gate { max-width: 440px; margin: 80px auto; background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 36px 32px; }
   .gate h2 { margin: 0 0 6px; font-size: 18px; font-weight: 600; }
   .gate p { color: var(--muted); font-size: 14px; margin: 0 0 20px; }
-  .gate input { width: 100%; padding: 10px 12px; border: 1px solid var(--line-strong); border-radius: var(--radius); font: inherit; margin-bottom: 12px; }
-  .gate input:focus { outline: none; border-color: var(--accent); }
-  .gate .err { color: #b03030; font-size: 13px; margin-bottom: 10px; min-height: 18px; }
-  .gate button { width: 100%; padding: 11px; background: var(--accent); color: #fff; border: none; border-radius: var(--radius); font: inherit; font-weight: 500; cursor: pointer; }
-  .gate button:hover { background: #224b85; }
+  .gate sgds-input { display: block; margin-bottom: 12px; }
+  .gate sgds-button { display: block; margin-top: 4px; }
+  .gate .gate-error { margin-bottom: 10px; }
+  .gate .gate-error[hidden] { display: none; }
   .gate .hint { font-size: 12px; color: var(--muted); text-align: center; margin-top: 14px; }
 
   .dashboard { display: none; }
@@ -62,15 +67,21 @@
   .toolbar { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; justify-content: space-between; margin-bottom: 18px; }
   .toolbar .left { display: flex; gap: 12px; flex-wrap: wrap; align-items: baseline; }
   .toolbar .right { display: flex; gap: 8px; flex-wrap: wrap; }
-  .toolbar select, .toolbar button.tool {
+  .toolbar select {
+    font: inherit; font-size: 13px; padding: 8px 16px;
+    border: 1px solid var(--line-strong); background: var(--surface);
+    border-radius: var(--radius); cursor: pointer; color: var(--ink);
+    min-width: 140px;
+  }
+
+  /* Pagination buttons (rendered dynamically inside dashContent) */
+  button.tool {
     font: inherit; font-size: 13px; padding: 8px 12px;
     border: 1px solid var(--line-strong); background: var(--surface);
     border-radius: var(--radius); cursor: pointer; color: var(--ink);
   }
-  .toolbar button.tool:hover { border-color: var(--accent); }
-  .toolbar button.tool.danger { color: #b03030; border-color: #d99a9a; }
-  .toolbar button.tool.danger:hover { background: var(--bad-bg); }
-  .toolbar button.tool.primary { background: var(--accent); color: #fff; border-color: var(--accent); }
+  button.tool:hover { border-color: var(--accent); }
+  button.tool:disabled { opacity: 0.4; cursor: default; }
 
   .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; margin-bottom: 22px; }
   .stat { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 14px 16px; }
@@ -131,47 +142,8 @@
   .qbar .qbar-fill { height: 100%; background: var(--accent); border-radius: 3px; transition: width .3s ease; }
   .qbar .qbar-val { font-size: 12px; font-variant-numeric: tabular-nums; color: var(--muted); text-align: right; }
 
-  /* SGDS-styled official government banner (fallback) */
-  .sgds-masthead {
-    background: #f0f0f0;
-    border-bottom: 1px solid #d9d9d9;
-    padding: 6px 0;
-    font-size: 12px;
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
-    position: relative; z-index: 100;
-  }
-  .sgds-masthead__inner { max-width: 1200px; margin: 0 auto; padding: 0 24px; display: flex; align-items: center; gap: 8px; }
-  .sgds-masthead__link { display: flex; align-items: center; gap: 6px; color: #484848; text-decoration: none; }
-  .sgds-masthead__link:hover { text-decoration: underline; }
-
-  /* SGDS-styled footer */
-  .sgds-footer {
-    background: #1a1a1a; color: #d9d9d9;
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
-    font-size: 14px; margin-top: 48px;
-  }
-  .sgds-footer__top { padding: 40px 0 28px; border-bottom: 1px solid #333; }
-  .sgds-footer__inner { max-width: 1200px; margin: 0 auto; padding: 0 24px; }
-  .sgds-footer__grid { display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 32px; }
-  .sgds-footer__brand-name { color: #fff; font-size: 16px; font-weight: 600; margin: 0 0 8px; }
-  .sgds-footer__description { color: #aaa; font-size: 13px; margin: 0 0 16px; line-height: 1.5; }
-  .sgds-footer__col-title { color: #fff; font-size: 12px; text-transform: uppercase; letter-spacing: .08em; font-weight: 600; margin: 0 0 10px; }
-  .sgds-footer__links { list-style: none; margin: 0; padding: 0; }
-  .sgds-footer__links li { margin-bottom: 8px; }
-  .sgds-footer__links a { color: #aaa; text-decoration: none; font-size: 13px; }
-  .sgds-footer__links a:hover { color: #fff; text-decoration: underline; }
-  .sgds-footer__bottom { padding: 16px 0; }
-  .sgds-footer__bottom-inner {
-    max-width: 1200px; margin: 0 auto; padding: 0 24px;
-    display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;
-  }
-  .sgds-footer__bottom-links { display: flex; gap: 16px; flex-wrap: wrap; }
-  .sgds-footer__bottom-links a { color: #888; font-size: 12px; text-decoration: none; }
-  .sgds-footer__bottom-links a:hover { color: #fff; text-decoration: underline; }
-  .sgds-footer__copyright { color: #666; font-size: 12px; }
-
-  /* ---- Reusable tooltip icon ---- */
-  .info {
+  /* Tooltip trigger icon (used inside sgds-tooltip) */
+  .tip-icon {
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -182,53 +154,17 @@
     color: var(--muted);
     font-size: 10px;
     font-weight: 700;
-    font-style: normal;
-    text-transform: none;
-    letter-spacing: 0;
     line-height: 1;
     cursor: help;
     margin-left: 6px;
     vertical-align: 1px;
-    position: relative;
     user-select: none;
     transition: background .15s, color .15s;
   }
-  .info:hover { background: var(--accent); color: #fff; }
-  .info::before { content: "i"; }
-  .info::after {
-    content: attr(data-tip);
-    position: absolute;
-    bottom: calc(100% + 8px);
-    left: 50%;
-    transform: translateX(-50%);
-    background: #1a1a1a;
-    color: #fff;
-    font-size: 12px;
-    font-weight: 400;
-    line-height: 1.45;
-    padding: 8px 10px;
-    border-radius: 4px;
-    width: max-content;
-    max-width: 260px;
-    text-align: left;
-    white-space: normal;
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity .15s;
-    z-index: 100;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.18);
-  }
-  .info::before { z-index: 1; }
-  .info:hover::after { opacity: 1; }
-  /* Tooltip arrow */
-  .info[data-tip]:hover::before {
-    /* keep the i visible */
-  }
-  .info.right::after { left: auto; right: 0; transform: none; }
-  .info.left::after  { left: 0; right: auto; transform: none; }
+  .tip-icon:hover { background: var(--accent); color: #fff; }
 
   @media print {
-    .toolbar .right, .footer-note, .gate, header.top a.survey-link, button { display: none !important; }
+    .toolbar .right, .footer-note, .gate, header.top a.survey-link, sgds-button, button { display: none !important; }
     body { background: #fff; }
     .panel, .stat { break-inside: avoid; box-shadow: none; }
     .responses-scroll { max-height: none; overflow: visible; }
@@ -236,37 +172,35 @@
   }
 
   @media (max-width: 600px) {
-    .wrap { padding: 20px 14px 60px; }
-    .sgds-footer__grid { grid-template-columns: 1fr; gap: 24px; }
-    .sgds-footer__bottom-inner { flex-direction: column; align-items: flex-start; }
+    .wrap { padding: 20px 16px 60px; }
+    .gate { margin: 40px auto; padding: 28px 20px; }
   }
 </style>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@govtechsg/sgds-web-component@3.17.0/themes/day.css" />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@govtechsg/sgds-web-component@3.17.0/css/sgds.css" />
+<script src="https://cdn.jsdelivr.net/npm/@govtechsg/sgds-web-component@3.17.0/components/Masthead/index.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@govtechsg/sgds-web-component@3.17.0/components/Input/index.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@govtechsg/sgds-web-component@3.17.0/components/Button/index.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@govtechsg/sgds-web-component@3.17.0/components/Alert/index.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@govtechsg/sgds-web-component@3.17.0/components/Badge/index.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@govtechsg/sgds-web-component@3.17.0/components/Tooltip/index.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@govtechsg/sgds-web-component@3.17.0/components/Footer/index.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@govtechsg/sgds-web-component@3.17.0/components/Link/index.umd.min.js"></script>
 </head>
 <body>
-<!-- SGDS Official Government Banner -->
-<!-- Static SGDS-styled masthead (offline-friendly; no external dependencies) -->
-<div class="sgds-masthead">
-  <div class="sgds-masthead__inner">
-    <svg width="20" height="20" viewBox="0 0 72 60" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-      <path d="M36 0C27.8 0 21 6.8 21 15s6.8 15 15 15 15-6.8 15-15S44.2 0 36 0z" fill="#DB0000"/>
-      <path d="M0 30h72v30H0z" fill="#DB0000"/>
-      <path d="M0 0h72v30H0z" fill="#fff"/>
-    </svg>
-    <a href="https://www.gov.sg" class="sgds-masthead__link" target="_blank" rel="noopener noreferrer">
-      A Singapore Government Agency Website
-    </a>
-  </div>
-</div>
+<sgds-masthead></sgds-masthead>
 <div class="wrap">
 
   <!-- ========= AUTH GATE ========= -->
   <div class="gate" id="gateScreen">
     <h2>Researcher access</h2>
     <p>This dashboard is for authorised MOM researchers only. Sign in with your <code>@mom.gov.sg</code> email to continue.</p>
-    <input type="email" id="gateEmail" placeholder="name@mom.gov.sg" autocomplete="email" />
-    <input type="password" id="gatePassphrase" placeholder="Passphrase" autocomplete="current-password" />
-    <div class="err" id="gateErr"></div>
-    <button id="gateBtn">Unlock dashboard</button>
+    <sgds-input type="email" id="gateEmail" label="Email" placeholder="name@mom.gov.sg"></sgds-input>
+    <sgds-input type="password" id="gatePassphrase" label="Passphrase" placeholder="Passphrase"></sgds-input>
+    <div class="gate-error" id="gateErrWrap" hidden>
+      <sgds-alert variant="danger" show id="gateErr"></sgds-alert>
+    </div>
+    <sgds-button variant="primary" id="gateBtn" fullWidth>Unlock dashboard</sgds-button>
     <div class="hint">Prototype passphrase: <code>research</code></div>
   </div>
 
@@ -274,7 +208,7 @@
   <div class="dashboard" id="dashboardScreen">
     <header class="top">
       <div>
-        <span class="badge">Researcher view</span>
+        <sgds-badge variant="info">Researcher view</sgds-badge>
         <h1>FDW eService — SUS Results Dashboard</h1>
         <div class="sub">Consolidated System Usability Scale responses for Work Permit transactions for domestic helpers and confinement nannies.</div>
       </div>
@@ -302,57 +236,40 @@
 
     <div class="toolbar" style="margin-top:18px;">
       <div class="left">
-        <button type="button" class="tool" id="seedBtn" title="Add demo data for preview">Add demo data</button>
+        <sgds-button variant="outline" id="seedBtn" title="Add demo data for preview">Add demo data</sgds-button>
       </div>
       <div class="right">
-        <button type="button" class="tool" id="exportAllCsvBtn">Export filtered (CSV)</button>
-        <button type="button" class="tool primary" id="printReportBtn">Print / PDF report</button>
-        <button type="button" class="tool danger" id="clearAllBtn">Clear all responses</button>
+        <sgds-button variant="outline" id="exportAllCsvBtn">Export filtered (CSV)</sgds-button>
+        <sgds-button variant="primary" id="printReportBtn">Print / PDF report</sgds-button>
+        <sgds-button variant="primary" tone="danger" id="clearAllBtn">Clear all responses</sgds-button>
       </div>
     </div>
 
-    <p class="footer-note">SUS is a 10-item Likert questionnaire (Brooke, 1996). Scores are 0–100; not a percentage. Responses are stored locally in this browser.</p>
+    <p class="footer-note">SUS is a 10-item Likert questionnaire (Brooke, 1996). Scores are 0–100; not a percentage. Responses are stored in a Neon (PostgreSQL) database via Vercel serverless functions.</p>
   </div>
 
 </div>
 
 <!-- SGDS Footer -->
-<footer class="sgds-footer" role="contentinfo">
-  <div class="sgds-footer__top">
-    <div class="sgds-footer__inner">
-      <div class="sgds-footer__grid">
-        <div>
-          <p class="sgds-footer__brand-name">Ministry of Manpower</p>
-          <p class="sgds-footer__description">FDW eService — Researcher Dashboard for SUS usability study on Work Permit transactions for domestic helpers and confinement nannies.</p>
-        </div>
-        <div>
-          <p class="sgds-footer__col-title">Useful Links</p>
-          <ul class="sgds-footer__links">
-            <li><a href="https://www.mom.gov.sg" target="_blank" rel="noopener noreferrer">MOM Website</a></li>
-            <li><a href="https://www.mom.gov.sg/passes-and-permits/work-permit-for-foreign-domestic-worker" target="_blank" rel="noopener noreferrer">Work Permit for FDW</a></li>
-          </ul>
-        </div>
-        <div>
-          <p class="sgds-footer__col-title">Contact</p>
-          <ul class="sgds-footer__links">
-            <li><a href="https://www.mom.gov.sg/contact-us" target="_blank" rel="noopener noreferrer">Contact MOM</a></li>
-            <li><a href="https://tech.gov.sg/report-vulnerability" target="_blank" rel="noopener noreferrer">Report Vulnerability</a></li>
-          </ul>
-        </div>
-      </div>
-    </div>
-  </div>
-  <div class="sgds-footer__bottom">
-    <div class="sgds-footer__bottom-inner">
-      <div class="sgds-footer__bottom-links">
-        <a href="https://www.mom.gov.sg/privacy-statement" target="_blank" rel="noopener noreferrer">Privacy Statement</a>
-        <a href="https://www.mom.gov.sg/terms-of-use" target="_blank" rel="noopener noreferrer">Terms of Use</a>
-        <a href="https://tech.gov.sg/report-vulnerability" target="_blank" rel="noopener noreferrer">Report Vulnerability</a>
-      </div>
-      <p class="sgds-footer__copyright">&copy; 2026 Government of Singapore. Last updated April 2026.</p>
-    </div>
-  </div>
-</footer>
+<sgds-footer
+  contacthref="https://www.mom.gov.sg/contact-us"
+  feedbackhref="https://www.mom.gov.sg/efeedback"
+  privacyhref="https://www.mom.gov.sg/privacy-statement"
+  termsofusehref="https://www.mom.gov.sg/terms-of-use"
+>
+  <h2 slot="title">Ministry of Manpower</h2>
+  <p slot="description">FDW eService — Researcher Dashboard for SUS usability study on Work Permit transactions for domestic helpers and confinement nannies.</p>
+  <sgds-footer-item slot="items">
+    <div slot="title">Useful Links</div>
+    <sgds-link><a href="https://www.mom.gov.sg" target="_blank">MOM Website</a></sgds-link>
+    <sgds-link><a href="https://www.mom.gov.sg/passes-and-permits/work-permit-for-foreign-domestic-worker" target="_blank">Work Permit for FDW</a></sgds-link>
+  </sgds-footer-item>
+  <sgds-footer-item slot="items">
+    <div slot="title">Contact</div>
+    <sgds-link><a href="https://www.mom.gov.sg/contact-us" target="_blank">Contact MOM</a></sgds-link>
+    <sgds-link><a href="https://tech.gov.sg/report-vulnerability" target="_blank">Report Vulnerability</a></sgds-link>
+  </sgds-footer-item>
+</sgds-footer>
 
 <script>
 /* ---------- Constants ---------- */
@@ -401,38 +318,64 @@ function lockDashboard() {
   document.getElementById('gateScreen').style.display = 'block';
   document.getElementById('gateEmail').value = '';
   document.getElementById('gatePassphrase').value = '';
+  document.getElementById('gateErrWrap').hidden = true;
   document.getElementById('gateErr').textContent = '';
 }
 
-document.getElementById('gateBtn').addEventListener('click', () => {
+function handleGateSubmit() {
   const v = document.getElementById('gateEmail').value;
   const p = document.getElementById('gatePassphrase').value;
   const result = tryUnlock(v, p);
-  if (!result.ok) document.getElementById('gateErr').textContent = result.error;
-});
-document.getElementById('gateEmail').addEventListener('keydown', (e) => {
-  if (e.key === 'Enter') document.getElementById('gateBtn').click();
-});
-document.getElementById('gatePassphrase').addEventListener('keydown', (e) => {
-  if (e.key === 'Enter') document.getElementById('gateBtn').click();
+  if (!result.ok) {
+    document.getElementById('gateErr').textContent = result.error;
+    document.getElementById('gateErrWrap').hidden = false;
+  }
+}
+
+document.getElementById('gateBtn').addEventListener('click', handleGateSubmit);
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Enter' && document.getElementById('gateScreen').style.display !== 'none') {
+    handleGateSubmit();
+  }
 });
 
-/* ---------- Data ---------- */
-// In-memory cache so we don't re-parse 3.5MB of JSON on every filter change.
+/* ---------- Data (Neon database via Vercel serverless API) ---------- */
+// In-memory cache so we don't re-fetch on every filter change.
 // Invalidated when we know writes happened (currently: clear, seed demo data).
 let _responsesCache = null;
-function loadResponses() {
+async function loadResponses() {
   if (_responsesCache) return _responsesCache;
   try {
-    const data = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+    const response = await fetch('/api/responses');
+    if (!response.ok) {
+      console.error('Failed to fetch responses:', response.status);
+      _responsesCache = [];
+      return _responsesCache;
+    }
+    const data = await response.json();
     if (!Array.isArray(data)) { _responsesCache = []; return _responsesCache; }
-    // Filter out any malformed records (e.g. from older versions or test probes)
+    // Filter out any malformed records
     _responsesCache = data.filter(r => r && r.screener && r.sus_responses && typeof r.sus_score === 'number');
     return _responsesCache;
-  } catch (e) { _responsesCache = []; return _responsesCache; }
+  } catch (e) {
+    console.error('Load error:', e);
+    _responsesCache = [];
+    return _responsesCache;
+  }
 }
 function invalidateResponsesCache() { _responsesCache = null; }
-function clearResponses() { localStorage.removeItem(STORAGE_KEY); invalidateResponsesCache(); }
+async function clearResponses() {
+  try {
+    const response = await fetch('/api/responses', { method: 'DELETE' });
+    if (!response.ok) throw new Error('Delete failed');
+    invalidateResponsesCache();
+    // Also clear the participant submission lockout
+    localStorage.removeItem('fdw_sus_submitted_v1');
+  } catch (e) {
+    console.error('Clear error:', e);
+    throw e;
+  }
+}
 
 /* ---------- Math ---------- */
 const avg = nums => nums.length ? nums.reduce((a,b)=>a+b,0) / nums.length : 0;
@@ -496,8 +439,8 @@ const PAGE_SIZE = 100;
 let currentPage = 1;
 
 /* ---------- Render ---------- */
-function renderDashboard() {
-  const all = loadResponses();
+async function renderDashboard() {
+  const all = await loadResponses();
   populateFilterOptions(all);
   const filtered = applyFilters(all);
 
@@ -549,27 +492,27 @@ function renderDashboard() {
   content.innerHTML = `
     <div class="stats-grid">
       <div class="stat">
-        <div class="label">Mean SUS<span class="info" data-tip="The average SUS score across all filtered responses. The mean is the standard headline metric for SUS — compare it to the industry average of ≈ 68."></span></div>
+        <div class="label">Mean SUS<sgds-tooltip content="The average SUS score across all filtered responses. The mean is the standard headline metric for SUS — compare it to the industry average of ≈ 68." placement="top"><span class="tip-icon">i</span></sgds-tooltip></div>
         <div class="value" style="color:var(--accent);">${meanScore.toFixed(1)}</div>
         <div class="sub2"><span class="grade-pill ${overallGrade.pill}">${overallGrade.letter} — ${overallGrade.label}</span></div>
       </div>
       <div class="stat">
-        <div class="label">Median<span class="info" data-tip="The middle score when responses are sorted. Less affected by outliers than the mean. If median ≫ mean, a few very low scores are dragging the average down."></span></div>
+        <div class="label">Median<sgds-tooltip content="The middle score when responses are sorted. Less affected by outliers than the mean. If median ≫ mean, a few very low scores are dragging the average down." placement="top"><span class="tip-icon">i</span></sgds-tooltip></div>
         <div class="value">${medianScore.toFixed(1)}</div>
         <div class="sub2">vs. industry avg ≈ 68</div>
       </div>
       <div class="stat">
-        <div class="label">Score consistency<span class="info" data-tip="Standard deviation — the average distance of each score from the mean. Lower (e.g. ±5) = responses agree closely. Higher (e.g. ±20) = responses are spread out / mixed opinions about the system."></span></div>
+        <div class="label">Score consistency<sgds-tooltip content="Standard deviation — the average distance of each score from the mean. Lower (e.g. ±5) = responses agree closely. Higher (e.g. ±20) = responses are spread out / mixed opinions about the system." placement="top"><span class="tip-icon">i</span></sgds-tooltip></div>
         <div class="value">±${sd.toFixed(1)}</div>
         <div class="sub2">${sd < 10 ? 'responses agree' : sd < 18 ? 'mixed opinions' : 'wide disagreement'}</div>
       </div>
       <div class="stat">
-        <div class="label">Range<span class="info" data-tip="The lowest and highest individual SUS scores in the filtered set. A wide range alongside high score consistency means most responses cluster, but a few outliers exist."></span></div>
+        <div class="label">Range<sgds-tooltip content="The lowest and highest individual SUS scores in the filtered set. A wide range alongside high score consistency means most responses cluster, but a few outliers exist." placement="top"><span class="tip-icon">i</span></sgds-tooltip></div>
         <div class="value">${minScore.toFixed(0)}–${maxScore.toFixed(0)}</div>
         <div class="sub2">min – max</div>
       </div>
       <div class="stat">
-        <div class="label">Possibly invalid<span class="info" data-tip="Responses where the participant said an Employment Agency (EA) handled the application for them. These users may not have interacted with the system enough to rate it validly. Use the 'Valid only' filter above to exclude them."></span></div>
+        <div class="label">Possibly invalid<sgds-tooltip content="Responses where the participant said an Employment Agency (EA) handled the application for them. These users may not have interacted with the system enough to rate it validly. Use the 'Valid only' filter above to exclude them." placement="top"><span class="tip-icon">i</span></sgds-tooltip></div>
         <div class="value">${flaggedCount}</div>
         <div class="sub2">EA did the application (${filtered.length ? Math.round(flaggedCount/filtered.length*100) : 0}% of responses)</div>
       </div>
@@ -577,7 +520,7 @@ function renderDashboard() {
 
     <div class="grid-2">
       <div class="panel">
-        <h3>Per-item score (higher = better, max 4)<span class="info" data-tip="SUS uses a 1–5 Likert scale, but each question contributes 0–4 points to the final SUS score (sum × 2.5 = score out of 100). Positive items (1, 3, 5, 7, 9): score = response − 1. Negative items (2, 4, 6, 8, 10): score = 5 − response. Either way, 4 = best, 0 = worst."></span></h3>
+        <h3>Per-item score (higher = better, max 4)<sgds-tooltip content="SUS uses a 1–5 Likert scale, but each question contributes 0–4 points to the final SUS score (sum × 2.5 = score out of 100). Positive items (1, 3, 5, 7, 9): score = response − 1. Negative items (2, 4, 6, 8, 10): score = 5 − response. Either way, 4 = best, 0 = worst." placement="top"><span class="tip-icon">i</span></sgds-tooltip></h3>
         ${itemAvgs.map(it => `
           <div class="qbar">
             <div class="qrow">
@@ -591,12 +534,12 @@ function renderDashboard() {
           </div>
         `).join('')}
         <p style="font-size:11px;color:var(--muted);margin:10px 0 0;line-height:1.5;">
-          Low bars indicate weak points in the system — candidates for redesign. Hover the <span class="info" data-tip="Detailed scoring explanation appears here on hover." style="position:relative;top:-1px;"></span> icon above for the full scoring formula.
+          Low bars indicate weak points in the system — candidates for redesign. Hover the <sgds-tooltip content="Detailed scoring explanation appears here on hover." placement="top"><span class="tip-icon">i</span></sgds-tooltip> icon above for the full scoring formula.
         </p>
       </div>
 
       <div class="panel">
-        <h3>Grade distribution<span class="info" data-tip="How many responses fell into each SUS grade band. A: ≥ 80.3 (Excellent). B: 74–80.3 (Good). C: 68–74 (Above avg, near industry baseline). D: 51–68 (Marginal). F: < 51 (Poor). Based on Bangor, Kortum & Miller (2009)."></span></h3>
+        <h3>Grade distribution<sgds-tooltip content="How many responses fell into each SUS grade band. A: ≥ 80.3 (Excellent). B: 74–80.3 (Good). C: 68–74 (Above avg, near industry baseline). D: 51–68 (Marginal). F: < 51 (Poor). Based on Bangor, Kortum & Miller (2009)." placement="top"><span class="tip-icon">i</span></sgds-tooltip></h3>
         ${['A','B','C','D','F'].map(g => {
           const n = gradeCounts[g];
           const pct = filtered.length ? (n/filtered.length*100) : 0;
@@ -608,7 +551,7 @@ function renderDashboard() {
             </div>`;
         }).join('')}
 
-        <h3 style="margin-top:22px;">Respondent profile<span class="info" data-tip="Breakdown of who answered the survey, by the three screener questions. Use this to check sample balance — e.g. if 90% of responses are from one residency type, results may not generalise."></span></h3>
+        <h3 style="margin-top:22px;">Respondent profile<sgds-tooltip content="Breakdown of who answered the survey, by the three screener questions. Use this to check sample balance — e.g. if 90% of responses are from one residency type, results may not generalise." placement="top"><span class="tip-icon">i</span></sgds-tooltip></h3>
         <div style="display:grid;grid-template-columns:1fr;gap:14px;">
           <div>
             <div style="font-size:11px;color:var(--muted);margin-bottom:4px;font-weight:600;text-transform:uppercase;letter-spacing:.05em;">Residency</div>
@@ -627,7 +570,7 @@ function renderDashboard() {
     </div>
 
     <div class="panel">
-      <h3>Summary report<span class="info" data-tip="Auto-generated narrative summary of the filtered responses. Updates live as you change filters above. Use the Print / PDF report button to export this view."></span></h3>
+      <h3>Summary report<sgds-tooltip content="Auto-generated narrative summary of the filtered responses. Updates live as you change filters above. Use the Print / PDF report button to export this view." placement="top"><span class="tip-icon">i</span></sgds-tooltip></h3>
       <p class="summary-text">
         Across <strong>${filtered.length}</strong> response${filtered.length===1?'':'s'},
         the FDW eService scored a mean SUS of <strong>${meanScore.toFixed(1)}</strong>
@@ -647,7 +590,7 @@ function renderDashboard() {
     </div>
 
     <div class="panel">
-      <h3>Individual responses (${filtered.length})<span class="info" data-tip="Raw response data — one row per submission. Q1–Q10 are the participant's 1–5 Likert answers (not the scored 0–4 contribution). 'Validity = flagged' means an EA completed the application on the participant's behalf."></span></h3>
+      <h3>Individual responses (${filtered.length})<sgds-tooltip content="Raw response data — one row per submission. Q1–Q10 are the participant's 1–5 Likert answers (not the scored 0–4 contribution). 'Validity = flagged' means an EA completed the application on the participant's behalf." placement="top"><span class="tip-icon">i</span></sgds-tooltip></h3>
       ${(() => {
         const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
         if (currentPage > totalPages) currentPage = totalPages;
@@ -722,10 +665,10 @@ function renderDashboard() {
 });
 
 /* ---------- Pagination clicks (delegated, since buttons are re-rendered) ---------- */
-document.getElementById('dashContent').addEventListener('click', (e) => {
+document.getElementById('dashContent').addEventListener('click', async (e) => {
   const btn = e.target.closest('button[data-page]');
   if (!btn) return;
-  const all = loadResponses();
+  const all = await loadResponses();
   const filteredCount = applyFilters(all).length;
   const totalPages = Math.max(1, Math.ceil(filteredCount / PAGE_SIZE));
   const action = btn.dataset.page;
@@ -737,8 +680,8 @@ document.getElementById('dashContent').addEventListener('click', (e) => {
 });
 
 /* ---------- Export CSV ---------- */
-document.getElementById('exportAllCsvBtn').addEventListener('click', () => {
-  const all = applyFilters(loadResponses());
+document.getElementById('exportAllCsvBtn').addEventListener('click', async () => {
+  const all = applyFilters(await loadResponses());
   if (!all.length) { alert('No responses to export.'); return; }
   const headers = ['id','timestamp','full_name','email','mobile','residency','scheme','ea_used',
     ...SUS_ITEMS.map(i => `Q${i.id}: ${i.text}`),
@@ -764,7 +707,7 @@ document.getElementById('exportAllCsvBtn').addEventListener('click', () => {
 document.getElementById('printReportBtn').addEventListener('click', () => window.print());
 
 /* ---------- Clear ---------- */
-document.getElementById('clearAllBtn').addEventListener('click', (e) => {
+document.getElementById('clearAllBtn').addEventListener('click', async (e) => {
   const btn = e.currentTarget;
   if (btn.dataset.confirming !== '1') {
     btn.dataset.confirming = '1';
@@ -776,63 +719,22 @@ document.getElementById('clearAllBtn').addEventListener('click', (e) => {
     return;
   }
   btn.dataset.confirming = '0';
-  btn.textContent = 'Clear all responses';
-  clearResponses();
-  // Also clear the participant submission lockout so the same browser can re-test
-  localStorage.removeItem('fdw_sus_submitted_v1');
-  renderDashboard();
+  btn.textContent = 'Clearing...';
+  btn.disabled = true;
+  try {
+    await clearResponses();
+    btn.textContent = 'Clear all responses';
+    await renderDashboard();
+  } catch (err) {
+    btn.textContent = 'Clear failed — retry?';
+  } finally {
+    btn.disabled = false;
+  }
 });
 
-/* ---------- Demo data ---------- */
+/* ---------- Demo data (disabled when using Neon database) ---------- */
 document.getElementById('seedBtn').addEventListener('click', (e) => {
-  const btn = e.currentTarget;
-  if (btn.dataset.confirming !== '1') {
-    const original = btn.textContent;
-    btn.dataset.confirming = '1';
-    btn.textContent = 'Click again to add 12 demo responses';
-    btn.style.borderColor = 'var(--accent)';
-    btn.style.color = 'var(--accent)';
-    setTimeout(() => {
-      btn.dataset.confirming = '0';
-      btn.textContent = original;
-      btn.style.borderColor = '';
-      btn.style.color = '';
-    }, 3500);
-    return;
-  }
-  btn.dataset.confirming = '0';
-  btn.textContent = 'Add demo data';
-  btn.style.borderColor = '';
-  btn.style.color = '';
-  const residencies = ['Singapore Citizen','Permanent Resident','Foreigner (EP/SP/DP)'];
-  const schemes = ['Standard','Joint Income','Sponsorship'];
-  const eas = ['No (Self-Applied)','Mixed','Yes (EA did it for me)'];
-  const all = loadResponses();
-  for (let i = 0; i < 12; i++) {
-    const sus = {};
-    let total = 0;
-    SUS_ITEMS.forEach(item => {
-      const v = 1 + Math.floor(Math.random() * 5);
-      sus[`Q${item.id}`] = v;
-      total += item.id % 2 === 1 ? v - 1 : 5 - v;
-    });
-    const ea = eas[Math.floor(Math.random()*eas.length)];
-    all.push({
-      id: 'demo_' + Date.now() + '_' + i,
-      timestamp: new Date(Date.now() - Math.random()*30*86400000).toISOString(),
-      screener: {
-        residency: residencies[Math.floor(Math.random()*residencies.length)],
-        scheme: schemes[Math.floor(Math.random()*schemes.length)],
-        ea_used: ea
-      },
-      sus_responses: sus,
-      sus_score: Math.round(total * 2.5 * 10) / 10,
-      validity_flag: ea === 'Yes (EA did it for me)' ? 'EA-completed — direct system interaction may be insufficient' : 'OK'
-    });
-  }
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(all));
-  invalidateResponsesCache();
-  renderDashboard();
+  alert('Demo data seeding is disabled when using the Neon database. Submit test responses via the participant survey instead.');
 });
 
 /* ---------- Auto-unlock if previously authed ---------- */
