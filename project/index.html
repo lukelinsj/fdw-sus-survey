@@ -33,7 +33,7 @@
   }
   .wrap { max-width: var(--maxw); margin: 0 auto; padding: 0 24px 80px; }
 
-  header.top { border-bottom: 1px solid var(--line); padding: 20px 0 16px; margin-bottom: 28px; position: sticky; top: 0; z-index: 50; background: var(--bg); transition: box-shadow .2s; }
+  header.top { border-bottom: 1px solid var(--line); padding: 20px 24px 16px; margin: 0 -24px 28px; position: sticky; top: 0; z-index: 50; background: var(--bg); transition: box-shadow .2s; }
   header.top.scrolled { box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
   header.top h1 { font-size: 20px; margin: 0 0 4px; font-weight: 600; letter-spacing: -0.01em; transition: font-size .2s, margin .2s; }
   header.top.scrolled h1 { font-size: 16px; margin-bottom: 0; }
@@ -45,7 +45,7 @@
   .progress-meta .pct { font-weight: 600; color: var(--accent); font-variant-numeric: tabular-nums; }
   .progress-track { height: 8px; background: var(--line); border-radius: 4px; overflow: hidden; }
   .progress-fill { height: 100%; width: 0%; background: var(--accent); transition: width .3s ease; border-radius: 4px; }
-  .progress-fill.complete { background: #2c5e35; }
+  .progress-fill.complete { background: var(--accent); }
 
   section.card { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 28px 28px 24px; margin-bottom: 22px; }
   section.card h2 { font-size: 13px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); margin: 0 0 4px; font-weight: 600; }
@@ -96,8 +96,8 @@
   .thanks { display: none; text-align: center; padding: 60px 24px; }
   .thanks.show { display: block; }
   .thanks .check {
-    width: 64px; height: 64px; border-radius: 50%; background: var(--ok-bg);
-    border: 2px solid var(--ok-border); display: inline-flex; align-items: center; justify-content: center;
+    width: 64px; height: 64px; border-radius: 50%; background: var(--accent-soft);
+    border: 2px solid var(--accent); display: inline-flex; align-items: center; justify-content: center;
     margin-bottom: 18px;
   }
   .thanks .check svg { width: 32px; height: 32px; }
@@ -120,7 +120,6 @@
 <script src="https://cdn.jsdelivr.net/npm/@govtechsg/sgds-web-component@3.17.0/components/Input/index.umd.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@govtechsg/sgds-web-component@3.17.0/components/Button/index.umd.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@govtechsg/sgds-web-component@3.17.0/components/Alert/index.umd.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@govtechsg/sgds-web-component@3.17.0/components/Badge/index.umd.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@govtechsg/sgds-web-component@3.17.0/components/Footer/index.umd.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@govtechsg/sgds-web-component@3.17.0/components/Link/index.umd.min.js"></script>
 </head>
@@ -239,7 +238,7 @@
 
   <div class="thanks" id="thanksScreen">
     <div class="check">
-      <svg viewBox="0 0 24 24" fill="none" stroke="#2c5e35" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 12 10 18 20 6"/></svg>
+      <svg viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 12 10 18 20 6"/></svg>
     </div>
     <h2>Thank you for your response</h2>
     <p>Your feedback has been recorded and will help us improve the FDW eService. You may now close this page.</p>
@@ -300,10 +299,7 @@ SUS_ITEMS.forEach(item => {
   div.innerHTML = `
     <div class="q-label">
       <span class="q-num">${item.id}.</span>
-      <span class="q-text">
-        <sgds-badge variant="info" style="margin-right:6px;">${item.dim}</sgds-badge>
-        ${item.text}<span class="q-required">*</span>
-      </span>
+      <span class="q-text">${item.text}<span class="q-required">*</span></span>
     </div>
     <div class="likert">
       <div class="likert-anchors"><span>${ANCHORS[0]}</span><span>${ANCHORS[4]}</span></div>
@@ -398,6 +394,8 @@ window.addEventListener('scroll', () => {
   if (surveyHeader) surveyHeader.classList.toggle('scrolled', window.scrollY > 20);
 }, { passive: true });
 
+const isPreviewMode = new URLSearchParams(location.search).get('preview') === '1';
+
 const SUBMITTED_KEY = 'fdw_sus_submitted_v1';
 async function saveResponse(record) {
   try {
@@ -480,7 +478,6 @@ document.getElementById('submitBtn').addEventListener('click', async () => {
   window.scrollTo({ top: 0, behavior: 'smooth' });
 });
 
-const isPreviewMode = new URLSearchParams(location.search).get('preview') === '1';
 if (localStorage.getItem(SUBMITTED_KEY) && !isPreviewMode) {
   document.getElementById('formScreen').classList.add('hidden');
   document.getElementById('alreadySubmittedScreen').classList.add('show');
