@@ -1,0 +1,456 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>FDW eService — Usability Survey</title>
+<style>
+  :root {
+    --bg: #fafaf8;
+    --surface: #ffffff;
+    --ink: #1a1a1a;
+    --muted: #5b5b5b;
+    --line: #e5e3dd;
+    --line-strong: #c9c6bd;
+    --accent: #2b5fa6;
+    --accent-soft: #e8eef7;
+    --warn-bg: #fff7e6;
+    --warn-border: #e6c97a;
+    --ok-bg: #eaf5ec;
+    --ok-border: #9ec6a3;
+    --radius: 6px;
+    --maxw: 760px;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    background: var(--bg);
+    color: var(--ink);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+    font-size: 16px;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+  }
+  .wrap { max-width: var(--maxw); margin: 0 auto; padding: 0 20px 80px; }
+  header.top { border-bottom: 1px solid var(--line); padding: 16px 20px 14px; margin: 0 -20px 28px; position: sticky; top: 0; z-index: 50; background: var(--bg); transition: box-shadow .2s; }
+  header.top.scrolled { box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+  header.top h1 { font-size: 20px; margin: 0 0 4px; font-weight: 600; letter-spacing: -0.01em; transition: font-size .2s, margin .2s; }
+  header.top.scrolled h1 { font-size: 16px; margin-bottom: 0; }
+  header.top .sub { color: var(--muted); font-size: 13px; transition: max-height .25s ease, opacity .15s, margin .2s; max-height: 60px; overflow: hidden; }
+  header.top.scrolled .sub { max-height: 0; opacity: 0; margin: 0; }
+  .progress-wrap { margin-top: 14px; transition: margin-top .2s; }
+  header.top.scrolled .progress-wrap { margin-top: 8px; }
+  .progress-meta { display: flex; justify-content: space-between; align-items: center; font-size: 13px; color: var(--muted); margin-bottom: 6px; }
+  .progress-meta .pct { font-weight: 600; color: var(--accent); font-variant-numeric: tabular-nums; }
+  .progress-track { height: 8px; background: var(--line); border-radius: 4px; overflow: hidden; }
+  .progress-fill { height: 100%; width: 0%; background: var(--accent); transition: width .3s ease; border-radius: 4px; }
+  .progress-fill.complete { background: #2c5e35; }
+
+  /* (legacy sticky-progress class — unused) */
+
+  section.card { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 24px 24px 20px; margin-bottom: 22px; }
+  section.card h2 { font-size: 13px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); margin: 0 0 4px; font-weight: 600; }
+  section.card .lead { font-size: 18px; font-weight: 500; margin: 0 0 18px; line-height: 1.4; }
+
+  .question { padding: 16px 0; border-top: 1px solid var(--line); }
+  .question:first-of-type { border-top: none; padding-top: 4px; }
+  .q-label { display: flex; gap: 10px; font-size: 16px; margin-bottom: 12px; align-items: baseline; }
+  .q-num { color: var(--muted); font-variant-numeric: tabular-nums; min-width: 22px; font-size: 14px; }
+  .q-text { flex: 1; }
+  .q-required { color: #b03030; margin-left: 4px; }
+  .q-tag {
+    display: inline-block; font-size: 11px; text-transform: uppercase; letter-spacing: .06em;
+    color: var(--muted); background: var(--accent-soft); padding: 2px 8px; border-radius: 3px;
+    margin-right: 6px; vertical-align: 1px;
+  }
+
+  .radio-group { display: flex; flex-direction: column; gap: 8px; margin-left: 32px; }
+  .radio-group label {
+    display: flex; align-items: center; gap: 10px; padding: 10px 12px;
+    border: 1px solid var(--line); border-radius: var(--radius); cursor: pointer;
+    font-size: 15px; transition: border-color .15s, background .15s;
+  }
+  .radio-group label:hover { border-color: var(--line-strong); }
+  .radio-group label:has(input:checked) { border-color: var(--accent); background: var(--accent-soft); }
+  .radio-group input[type="radio"] { accent-color: var(--accent); margin: 0; }
+
+  .likert { margin-left: 32px; }
+  .likert-anchors { display: flex; justify-content: space-between; font-size: 12px; color: var(--muted); margin-bottom: 6px; padding: 0 4px; }
+  .likert-row { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; }
+  .likert-row label {
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    padding: 12px 4px; border: 1px solid var(--line); border-radius: var(--radius);
+    cursor: pointer; background: var(--surface); font-size: 13px; color: var(--muted);
+    transition: all .12s ease; user-select: none; position: relative;
+  }
+  .likert-row label:hover { border-color: var(--line-strong); }
+  .likert-row label .num { font-size: 16px; font-weight: 500; color: var(--ink); margin-bottom: 2px; }
+  .likert-row input[type="radio"] { position: absolute; opacity: 0; pointer-events: none; }
+  .likert-row label:has(input:checked) { border-color: var(--accent); background: var(--accent-soft); color: var(--ink); }
+  .likert-row label:has(input:checked) .num { color: var(--accent); font-weight: 600; }
+
+  .validity-warn { display: none; margin: 12px 0 0; padding: 12px 14px; background: var(--warn-bg); border: 1px solid var(--warn-border); border-radius: var(--radius); font-size: 14px; color: #6b4c0d; }
+  .validity-warn.show { display: block; }
+
+  .actions { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-top: 28px; flex-wrap: wrap; }
+  button.primary, button.secondary {
+    font: inherit; padding: 12px 22px; border-radius: var(--radius);
+    border: 1px solid var(--accent); cursor: pointer; font-weight: 500; transition: background .15s;
+  }
+  button.primary { background: var(--accent); color: #fff; }
+  button.primary:hover { background: #224b85; }
+  button.secondary { background: transparent; color: var(--accent); }
+  button.secondary:hover { background: var(--accent-soft); }
+  .status-msg { font-size: 14px; color: var(--muted); }
+  .status-msg.error { color: #b03030; }
+
+  /* Thank-you screen (participant only — no scores shown) */
+  .thanks { display: none; text-align: center; padding: 60px 24px; }
+  .thanks.show { display: block; }
+  .thanks .check {
+    width: 64px; height: 64px; border-radius: 50%; background: var(--ok-bg);
+    border: 2px solid var(--ok-border); display: inline-flex; align-items: center; justify-content: center;
+    margin-bottom: 18px;
+  }
+  .thanks .check svg { width: 32px; height: 32px; }
+  .thanks h2 { font-size: 24px; margin: 0 0 8px; font-weight: 600; }
+  .thanks p { color: var(--muted); margin: 0 0 24px; max-width: 480px; margin-left: auto; margin-right: auto; }
+
+  .form-screen.hidden { display: none; }
+
+  .footer-note { margin-top: 32px; font-size: 12px; color: var(--muted); text-align: center; }
+
+  body.completed #surveyHeader { display: none; }
+
+  #previewBanner.show { display: block !important; }
+
+  @media (max-width: 560px) {
+    .wrap { padding: 20px 14px 60px; }
+    section.card { padding: 18px 16px; }
+    .radio-group, .likert, .text-input-group { margin-left: 0; }
+    .likert-row label { padding: 10px 2px; font-size: 11px; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="top" id="surveyHeader">
+    <h1>FDW eService — Usability Survey</h1>
+    <div class="sub">Work Permit transactions for domestic helpers and confinement nannies. 10-item SUS + 3 screener questions. Approx. 3 minutes.</div>
+    <div class="progress-wrap">
+      <div class="progress-meta">
+        <span id="progressLabel">0 of 13 questions answered</span>
+        <span class="pct" id="progressPct">0%</span>
+      </div>
+      <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
+    </div>
+  </header>
+
+  <div id="previewBanner" style="display:none;background:var(--accent-soft);border:1px solid var(--accent);border-radius:var(--radius);padding:12px 16px;margin-bottom:18px;font-size:14px;color:var(--accent);">
+    <strong>Preview mode</strong> — you're viewing the survey questions as a researcher. Submissions are disabled and your existing response (if any) is preserved.
+    <a href="Researcher Dashboard.html" style="color:var(--accent);float:right;">← Back to dashboard</a>
+  </div>
+
+  <div class="form-screen" id="formScreen">
+    <form id="susForm" novalidate>
+
+      <!-- ============ SCREENER ============ -->
+      <section class="card">
+        <h2>Screener</h2>
+        <p class="lead">A few quick questions about your situation before we begin.</p>
+
+        <div class="question" data-q="residency">
+          <div class="q-label"><span class="q-num">S1.</span><span class="q-text">What is your residency status?<span class="q-required">*</span></span></div>
+          <div class="radio-group">
+            <label><input type="radio" name="residency" value="Singapore Citizen" required><span>Singapore Citizen</span></label>
+            <label><input type="radio" name="residency" value="Permanent Resident"><span>Permanent Resident</span></label>
+            <label><input type="radio" name="residency" value="Foreigner (EP/SP/DP)"><span>Foreigner (EP / SP / DP)</span></label>
+          </div>
+        </div>
+
+        <div class="question" data-q="scheme">
+          <div class="q-label"><span class="q-num">S2.</span><span class="q-text">Which application scheme did you use?<span class="q-required">*</span></span></div>
+          <div class="radio-group">
+            <label><input type="radio" name="scheme" value="Standard" required><span>Standard</span></label>
+            <label><input type="radio" name="scheme" value="Joint Income"><span>Joint Income</span></label>
+            <label><input type="radio" name="scheme" value="Sponsorship"><span>Sponsorship</span></label>
+          </div>
+        </div>
+
+        <div class="question" data-q="ea">
+          <div class="q-label"><span class="q-num">S3.</span><span class="q-text">Did you use an Employment Agency (EA)?<span class="q-required">*</span></span></div>
+          <div class="radio-group">
+            <label><input type="radio" name="ea" value="No (Self-Applied)" required><span>No — I self-applied</span></label>
+            <label><input type="radio" name="ea" value="Mixed"><span>Mixed — I did some, EA did some</span></label>
+            <label><input type="radio" name="ea" value="Yes (EA did it for me)"><span>Yes — the EA did it for me</span></label>
+          </div>
+          <div class="validity-warn" id="eaWarn">
+            <strong>Heads up:</strong> If the EA did the application for you, you may not have interacted with the system enough to rate its usability. You can still complete the survey, but your response will be marked for the researcher's review.
+          </div>
+        </div>
+      </section>
+
+      <!-- ============ SUS ============ -->
+      <section class="card">
+        <h2>System Usability Scale</h2>
+        <p class="lead">Thinking about your experience using the FDW eService, please indicate how much you agree with each statement.</p>
+        <div id="susItems"></div>
+      </section>
+
+      <div class="actions">
+        <div class="status-msg" id="statusMsg">All questions are required.</div>
+        <button type="submit" class="primary" id="submitBtn">Submit response</button>
+      </div>
+    </form>
+  </div>
+
+  <!-- Thank-you screen — NO score shown to participant -->
+  <div class="thanks" id="thanksScreen">
+    <div class="check">
+      <svg viewBox="0 0 24 24" fill="none" stroke="#2c5e35" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 12 10 18 20 6"/></svg>
+    </div>
+    <h2>Thank you for your response</h2>
+    <p>Your feedback has been recorded and will help us improve the FDW eService. You may now close this page.</p>
+  </div>
+
+  <!-- Already-submitted screen — shown if a response was previously made on this browser -->
+  <div class="thanks" id="alreadySubmittedScreen">
+    <div class="check" style="background:var(--accent-soft);border-color:var(--accent);">
+      <svg viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 12 10 18 20 6"/></svg>
+    </div>
+    <h2>You've already responded</h2>
+    <p>Thanks for taking part! You can only submit once.</p>
+  </div>
+
+  <p class="footer-note">This is an anonymous usability survey. Responses are stored locally for the research team.</p>
+</div>
+
+<script>
+/* ---------- SUS items — FDW eService wording ---------- */
+const SYSTEM_NAME = "Work Permit transactions for domestic helpers and confinement nannies (FDW eService)";
+const SUS_ITEMS = [
+  { id: 1,  dim: "Frequency",     text: `I think that I would like to use ${SYSTEM_NAME} again for future needs.` },
+  { id: 2,  dim: "Complexity",    text: `I found ${SYSTEM_NAME} unnecessarily complex.` },
+  { id: 3,  dim: "Ease of Use",   text: `I thought ${SYSTEM_NAME} was easy to use.` },
+  { id: 4,  dim: "Support",       text: `I think that I would need the support of a technical person to be able to use ${SYSTEM_NAME}.` },
+  { id: 5,  dim: "Integration",   text: `I found the various functions in ${SYSTEM_NAME} were well integrated.` },
+  { id: 6,  dim: "Inconsistency", text: `I thought there was too much inconsistency in ${SYSTEM_NAME}.` },
+  { id: 7,  dim: "Learnability",  text: `I would imagine that most people would learn to use ${SYSTEM_NAME} very quickly.` },
+  { id: 8,  dim: "Cumbersome",    text: `I found ${SYSTEM_NAME} very cumbersome to use.` },
+  { id: 9,  dim: "Confidence",    text: `I felt very confident using ${SYSTEM_NAME}.` },
+  { id: 10, dim: "Knowledge",     text: `I needed to learn a lot of things before I could get going with ${SYSTEM_NAME}.` }
+];
+const ANCHORS = ["Strongly disagree", "Disagree", "Neutral", "Agree", "Strongly agree"];
+
+/* Render */
+const susContainer = document.getElementById('susItems');
+SUS_ITEMS.forEach(item => {
+  const div = document.createElement('div');
+  div.className = 'question';
+  div.dataset.q = `sus${item.id}`;
+  div.innerHTML = `
+    <div class="q-label">
+      <span class="q-num">${item.id}.</span>
+      <span class="q-text">${item.text}<span class="q-required">*</span></span>
+    </div>
+    <div class="likert">
+      <div class="likert-anchors"><span>${ANCHORS[0]}</span><span>${ANCHORS[4]}</span></div>
+      <div class="likert-row">
+        ${[1,2,3,4,5].map(v => `
+          <label title="${ANCHORS[v-1]}">
+            <input type="radio" name="sus${item.id}" value="${v}" required>
+            <span class="num">${v}</span>
+            <span>${ANCHORS[v-1]}</span>
+          </label>`).join('')}
+      </div>
+    </div>
+  `;
+  susContainer.appendChild(div);
+});
+
+/* Progress */
+const RADIO_NAMES = ['residency','scheme','ea', ...SUS_ITEMS.map(i => `sus${i.id}`)];
+const TEXT_NAMES = ['full_name','email','contact'];
+const REQUIRED_NAMES = [...TEXT_NAMES, ...RADIO_NAMES];
+const progressFill = document.getElementById('progressFill');
+
+/* Validators — light-touch, allow international formats */
+const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const PHONE_RE = /^[+\d][\d\s\-()]{6,}$/;
+function isFieldFilled(name) {
+  const form = document.getElementById('susForm');
+  if (RADIO_NAMES.includes(name)) {
+    return !!form.querySelector(`input[name="${name}"]:checked`);
+  }
+  // Text inputs — must be valid, not just non-empty
+  const el = form.querySelector(`input[name="${name}"]`);
+  if (!el) return false;
+  const v = el.value.trim();
+  if (!v) return false;
+  if (name === 'email') return EMAIL_RE.test(v);
+  if (name === 'contact') return PHONE_RE.test(v) && v.replace(/\D/g,'').length >= 7;
+  if (name === 'full_name') return v.length >= 2;
+  return true;
+}
+
+function updateProgress() {
+  let answered = 0;
+  REQUIRED_NAMES.forEach(n => { if (isFieldFilled(n)) answered++; });
+  const total = REQUIRED_NAMES.length;
+  const pct = Math.round((answered / total) * 100);
+  progressFill.style.width = pct + '%';
+  document.getElementById('progressPct').textContent = pct + '%';
+  document.getElementById('progressLabel').textContent =
+    answered === total
+      ? `All ${total} questions answered — ready to submit`
+      : `${answered} of ${total} questions answered`;
+  progressFill.classList.toggle('complete', answered === total);
+  const sm = document.getElementById('statusMsg');
+  if (answered === total) { sm.textContent = 'Ready to submit.'; sm.classList.remove('error'); }
+  else { sm.textContent = `${total - answered} question${total-answered===1?'':'s'} remaining.`; sm.classList.remove('error'); }
+}
+
+/* Inline validation for text fields on blur */
+TEXT_NAMES.forEach(name => {
+  const el = document.getElementById(name);
+  const errEl = document.getElementById('err_' + name);
+  if (!el || !errEl) return;
+  const validate = () => {
+    const v = el.value.trim();
+    let msg = '';
+    if (!v) msg = 'This field is required.';
+    else if (name === 'email' && !EMAIL_RE.test(v)) msg = 'Please enter a valid email address.';
+    else if (name === 'contact' && (!PHONE_RE.test(v) || v.replace(/\D/g,'').length < 7)) msg = 'Please enter a valid phone number.';
+    else if (name === 'full_name' && v.length < 2) msg = 'Please enter your full name.';
+    errEl.textContent = msg;
+    el.classList.toggle('invalid', !!msg);
+    return !msg;
+  };
+  el.addEventListener('blur', validate);
+  el.addEventListener('input', () => {
+    // Clear errors live as the user types, but don't add new errors until blur
+    if (el.classList.contains('invalid')) validate();
+    updateProgress();
+  });
+});
+
+document.getElementById('susForm').addEventListener('change', (e) => {
+  updateProgress();
+  if (e.target.name === 'ea') {
+    const warn = document.getElementById('eaWarn');
+    if (e.target.value === 'Yes (EA did it for me)') warn.classList.add('show');
+    else warn.classList.remove('show');
+  }
+});
+updateProgress();
+
+/* Compact header on scroll */
+const surveyHeader = document.getElementById('surveyHeader');
+window.addEventListener('scroll', () => {
+  if (surveyHeader) surveyHeader.classList.toggle('scrolled', window.scrollY > 20);
+}, { passive: true });
+
+/* Scoring (computed but NOT shown to participant) */
+function calculateSUS(responses) {
+  let total = 0;
+  SUS_ITEMS.forEach(item => {
+    const r = Number(responses[`sus${item.id}`]);
+    total += item.id % 2 === 1 ? r - 1 : 5 - r;
+  });
+  return Math.round(total * 2.5 * 10) / 10;
+}
+
+/* Storage (shared with researcher dashboard via same key) */
+const STORAGE_KEY = 'fdw_sus_responses_v1';
+const SUBMITTED_KEY = 'fdw_sus_submitted_v1';
+function saveResponse(record) {
+  let all = [];
+  try { all = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]'); } catch(e){}
+  if (!Array.isArray(all)) all = [];
+  all.push({ ...record, id: 'r_' + Date.now() + '_' + Math.random().toString(36).slice(2,7) });
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(all));
+    localStorage.setItem(SUBMITTED_KEY, new Date().toISOString());
+    return { ok: true };
+  } catch (err) {
+    // QuotaExceededError — localStorage is typically capped at 5–10 MB per origin.
+    // At ~700 bytes/response, that's roughly 7,000–14,000 responses before this triggers.
+    return { ok: false, error: 'storage_full' };
+  }
+}
+
+/* Submit */
+document.getElementById('susForm').addEventListener('submit', (e) => {
+  e.preventDefault();
+  if (isPreviewMode) {
+    alert('Preview mode: submissions are disabled. Open the survey without ?preview=1 to record a real response.');
+    return;
+  }
+  const form = e.currentTarget;
+  const data = new FormData(form);
+  const missing = REQUIRED_NAMES.filter(n => !isFieldFilled(n));
+  if (missing.length) {
+    const sm = document.getElementById('statusMsg');
+    sm.textContent = `Please complete all required fields (${missing.length} remaining).`;
+    sm.classList.add('error');
+    // Trigger inline error display for missing text fields
+    missing.filter(n => TEXT_NAMES.includes(n)).forEach(n => {
+      const el = document.getElementById(n);
+      if (el) el.dispatchEvent(new Event('blur'));
+    });
+    const firstMissingEl = form.querySelector(`[data-q="${missing[0]}"]`);
+    if (firstMissingEl) firstMissingEl.scrollIntoView({behavior:'smooth', block:'center'});
+    return;
+  }
+  const responses = {};
+  RADIO_NAMES.forEach(n => responses[n] = data.get(n));
+  TEXT_NAMES.forEach(n => responses[n] = (data.get(n) || '').toString().trim());
+  const score = calculateSUS(responses);
+
+  const record = {
+    timestamp: new Date().toISOString(),
+    contact: { full_name: responses.full_name, email: responses.email, phone: responses.contact },
+    screener: { residency: responses.residency, scheme: responses.scheme, ea_used: responses.ea },
+    sus_responses: Object.fromEntries(SUS_ITEMS.map(i => [`Q${i.id}`, Number(responses[`sus${i.id}`])])),
+    sus_score: score,
+    validity_flag: responses.ea === 'Yes (EA did it for me)' ? 'EA-completed — direct system interaction may be insufficient' : 'OK'
+  };
+  const saveResult = saveResponse(record);
+  if (!saveResult.ok) {
+    const sm = document.getElementById('statusMsg');
+    sm.textContent = 'Sorry — we could not save your response. The system is at capacity. Please contact the researcher.';
+    sm.classList.add('error');
+    return;
+  }
+
+  document.getElementById('formScreen').classList.add('hidden');
+  document.getElementById('thanksScreen').classList.add('show');
+  document.body.classList.add('completed');
+  window.scrollTo({top:0, behavior:'smooth'});
+});
+
+/* Restart */
+const restartBtn = document.getElementById('restartBtn');
+if (restartBtn) restartBtn.addEventListener('click', () => {  document.getElementById('susForm').reset();
+  document.getElementById('eaWarn').classList.remove('show');
+  document.getElementById('formScreen').classList.remove('hidden');
+  document.getElementById('thanksScreen').classList.remove('show');
+  document.body.classList.remove('completed');
+  updateProgress();
+  window.scrollTo({top:0, behavior:'smooth'});
+});
+
+/* One response per browser — check on load (skip in preview mode) */
+const isPreviewMode = new URLSearchParams(location.search).get('preview') === '1';
+if (localStorage.getItem(SUBMITTED_KEY) && !isPreviewMode) {
+  document.getElementById('formScreen').classList.add('hidden');
+  document.getElementById('alreadySubmittedScreen').classList.add('show');
+  document.body.classList.add('completed');
+}
+if (isPreviewMode) {
+  document.getElementById('previewBanner').classList.add('show');
+}
+</script>
+</body>
+</html>

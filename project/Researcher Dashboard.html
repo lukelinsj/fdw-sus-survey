@@ -1,0 +1,728 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>FDW eService SUS — Researcher Dashboard</title>
+<style>
+  :root {
+    --bg: #fafaf8;
+    --surface: #ffffff;
+    --ink: #1a1a1a;
+    --muted: #5b5b5b;
+    --line: #e5e3dd;
+    --line-strong: #c9c6bd;
+    --accent: #2b5fa6;
+    --accent-soft: #e8eef7;
+    --warn-bg: #fff7e6;
+    --warn-border: #e6c97a;
+    --ok-bg: #eaf5ec;
+    --ok-border: #9ec6a3;
+    --bad-bg: #fbeaea;
+    --bad-border: #d99a9a;
+    --radius: 6px;
+    --maxw: 1100px;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    background: var(--bg);
+    color: var(--ink);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+    font-size: 16px;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+  }
+  .wrap { max-width: var(--maxw); margin: 0 auto; padding: 32px 24px 80px; }
+  header.top { border-bottom: 1px solid var(--line); padding-bottom: 18px; margin-bottom: 24px; display: flex; justify-content: space-between; align-items: flex-end; gap: 16px; flex-wrap: wrap; }
+  header.top h1 { font-size: 22px; margin: 0 0 4px; font-weight: 600; letter-spacing: -0.01em; }
+  header.top .sub { color: var(--muted); font-size: 14px; }
+  header.top .badge {
+    font-size: 11px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--accent);
+    background: var(--accent-soft); padding: 4px 10px; border-radius: 999px; font-weight: 600;
+    display: inline-block; margin-bottom: 8px;
+  }
+  header.top a.survey-link { font-size: 13px; color: var(--muted); text-decoration: none; border: 1px solid var(--line-strong); padding: 6px 12px; border-radius: var(--radius); }
+  header.top a.survey-link:hover { background: var(--surface); }
+
+  /* Auth gate */
+  .gate { max-width: 420px; margin: 80px auto; background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 32px; }
+  .gate h2 { margin: 0 0 6px; font-size: 18px; font-weight: 600; }
+  .gate p { color: var(--muted); font-size: 14px; margin: 0 0 20px; }
+  .gate input { width: 100%; padding: 10px 12px; border: 1px solid var(--line-strong); border-radius: var(--radius); font: inherit; margin-bottom: 12px; }
+  .gate input:focus { outline: none; border-color: var(--accent); }
+  .gate .err { color: #b03030; font-size: 13px; margin-bottom: 10px; min-height: 18px; }
+  .gate button { width: 100%; padding: 11px; background: var(--accent); color: #fff; border: none; border-radius: var(--radius); font: inherit; font-weight: 500; cursor: pointer; }
+  .gate button:hover { background: #224b85; }
+  .gate .hint { font-size: 12px; color: var(--muted); text-align: center; margin-top: 14px; }
+
+  .dashboard { display: none; }
+  .dashboard.show { display: block; }
+
+  .toolbar { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; justify-content: space-between; margin-bottom: 18px; }
+  .toolbar .left { display: flex; gap: 12px; flex-wrap: wrap; align-items: baseline; }
+  .toolbar .right { display: flex; gap: 8px; flex-wrap: wrap; }
+  .toolbar select, .toolbar button.tool {
+    font: inherit; font-size: 13px; padding: 8px 12px;
+    border: 1px solid var(--line-strong); background: var(--surface);
+    border-radius: var(--radius); cursor: pointer; color: var(--ink);
+  }
+  .toolbar button.tool:hover { border-color: var(--accent); }
+  .toolbar button.tool.danger { color: #b03030; border-color: #d99a9a; }
+  .toolbar button.tool.danger:hover { background: var(--bad-bg); }
+  .toolbar button.tool.primary { background: var(--accent); color: #fff; border-color: var(--accent); }
+
+  .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; margin-bottom: 22px; }
+  .stat { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 14px 16px; }
+  .stat .label { font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); font-weight: 600; }
+  .stat .value { font-size: 28px; font-weight: 600; margin-top: 4px; font-variant-numeric: tabular-nums; letter-spacing: -0.01em; }
+  .stat .sub2 { font-size: 12px; color: var(--muted); margin-top: 2px; }
+
+  .grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(360px, 1fr)); gap: 16px; }
+
+  .panel { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 20px 22px; margin-bottom: 16px; }
+  .panel h3 { font-size: 13px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); margin: 0 0 14px; font-weight: 600; }
+
+  .item-bar { display: grid; grid-template-columns: 24px 1fr 80px; gap: 10px; align-items: center; margin-bottom: 10px; font-size: 13px; }
+  .item-bar .num { color: var(--muted); font-variant-numeric: tabular-nums; }
+  .item-bar .bar-wrap { background: var(--line); height: 22px; border-radius: 3px; overflow: hidden; position: relative; }
+  .item-bar .bar-fill { height: 100%; background: var(--accent); border-radius: 3px; transition: width .3s ease; }
+  .item-bar .bar-label { position: absolute; left: 8px; top: 50%; transform: translateY(-50%); font-size: 12px; color: #fff; font-weight: 500; mix-blend-mode: difference; }
+  .item-bar .val { text-align: right; font-variant-numeric: tabular-nums; color: var(--muted); }
+
+  .dist-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  .dist-table td { padding: 6px 8px; border-bottom: 1px solid var(--line); }
+  .dist-table td.num { text-align: right; font-variant-numeric: tabular-nums; }
+
+  .empty-state { text-align: center; padding: 60px 20px; color: var(--muted); font-size: 14px; }
+  .empty-state strong { color: var(--ink); display: block; font-size: 16px; margin-bottom: 6px; }
+
+  .responses-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+  .responses-table th, .responses-table td { padding: 8px 6px; border-bottom: 1px solid var(--line); text-align: left; vertical-align: top; }
+  .responses-table th { font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); font-weight: 600; background: #f5f3ee; position: sticky; top: 0; }
+  .responses-table td.num { text-align: right; font-variant-numeric: tabular-nums; }
+  .responses-scroll { max-height: 420px; overflow: auto; border: 1px solid var(--line); border-radius: var(--radius); }
+  .flag-pill { display: inline-block; padding: 2px 6px; border-radius: 3px; font-size: 11px; background: var(--warn-bg); border: 1px solid var(--warn-border); color: #6b4c0d; }
+
+  .grade-A { color: #2c5e35; font-weight: 600; }
+  .grade-B { color: #4a5c1f; font-weight: 600; }
+  .grade-C { color: #6b4c0d; font-weight: 600; }
+  .grade-D { color: #7a3e0a; font-weight: 600; }
+  .grade-F { color: #7a1f1f; font-weight: 600; }
+
+  .grade-pill { display: inline-block; padding: 4px 12px; border-radius: 999px; font-weight: 600; font-size: 13px; border: 1px solid; }
+  .pill-A { background: var(--ok-bg); border-color: var(--ok-border); color: #2c5e35; }
+  .pill-B { background: #f0f5e8; border-color: #b8c992; color: #4a5c1f; }
+  .pill-C { background: #fff7e6; border-color: var(--warn-border); color: #6b4c0d; }
+  .pill-D { background: #fbeee0; border-color: #d9a373; color: #7a3e0a; }
+  .pill-F { background: var(--bad-bg); border-color: var(--bad-border); color: #7a1f1f; }
+
+  .summary-text { font-size: 14px; line-height: 1.6; }
+  .summary-text strong { color: var(--ink); }
+
+  /* Per-item question rows (full question text + score bar) */
+  .qbar { padding: 12px 0; border-bottom: 1px solid var(--line); }
+  .qbar:last-child { border-bottom: none; }
+  .qbar .qrow { display: flex; gap: 10px; align-items: flex-start; margin-bottom: 8px; font-size: 13px; line-height: 1.45; }
+  .qbar .qnum { color: var(--muted); font-variant-numeric: tabular-nums; min-width: 22px; flex-shrink: 0; }
+  .qbar .qtext { flex: 1; color: var(--ink); }
+  .qbar .qscorerow { display: grid; grid-template-columns: 1fr 70px; gap: 10px; align-items: center; padding-left: 32px; }
+  .qbar .qbar-wrap { background: var(--line); height: 14px; border-radius: 3px; overflow: hidden; position: relative; }
+  .qbar .qbar-fill { height: 100%; background: var(--accent); border-radius: 3px; transition: width .3s ease; }
+  .qbar .qbar-val { font-size: 12px; font-variant-numeric: tabular-nums; color: var(--muted); text-align: right; }
+
+  .footer-note { margin-top: 32px; font-size: 12px; color: var(--muted); text-align: center; }
+
+  /* ---- Reusable tooltip icon ---- */
+  .info {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background: var(--line);
+    color: var(--muted);
+    font-size: 10px;
+    font-weight: 700;
+    font-style: normal;
+    text-transform: none;
+    letter-spacing: 0;
+    line-height: 1;
+    cursor: help;
+    margin-left: 6px;
+    vertical-align: 1px;
+    position: relative;
+    user-select: none;
+    transition: background .15s, color .15s;
+  }
+  .info:hover { background: var(--accent); color: #fff; }
+  .info::before { content: "i"; }
+  .info::after {
+    content: attr(data-tip);
+    position: absolute;
+    bottom: calc(100% + 8px);
+    left: 50%;
+    transform: translateX(-50%);
+    background: #1a1a1a;
+    color: #fff;
+    font-size: 12px;
+    font-weight: 400;
+    line-height: 1.45;
+    padding: 8px 10px;
+    border-radius: 4px;
+    width: max-content;
+    max-width: 260px;
+    text-align: left;
+    white-space: normal;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity .15s;
+    z-index: 100;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.18);
+  }
+  .info::before { z-index: 1; }
+  .info:hover::after { opacity: 1; }
+  /* Tooltip arrow */
+  .info[data-tip]:hover::before {
+    /* keep the i visible */
+  }
+  .info.right::after { left: auto; right: 0; transform: none; }
+  .info.left::after  { left: 0; right: auto; transform: none; }
+
+  @media print {
+    .toolbar .right, .footer-note, .gate, header.top a.survey-link, button { display: none !important; }
+    body { background: #fff; }
+    .panel, .stat { break-inside: avoid; box-shadow: none; }
+    .responses-scroll { max-height: none; overflow: visible; }
+    .wrap { max-width: none; padding: 0; }
+  }
+
+  @media (max-width: 600px) {
+    .wrap { padding: 20px 14px 60px; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <!-- ========= AUTH GATE ========= -->
+  <div class="gate" id="gateScreen">
+    <h2>Researcher access</h2>
+    <p>This dashboard is for researchers only. Enter the access passphrase to continue.</p>
+    <input type="password" id="gatePass" placeholder="Passphrase" autocomplete="off" />
+    <div class="err" id="gateErr"></div>
+    <button id="gateBtn">Unlock dashboard</button>
+    <div class="hint">Default passphrase: <code>research</code></div>
+  </div>
+
+  <!-- ========= DASHBOARD ========= -->
+  <div class="dashboard" id="dashboardScreen">
+    <header class="top">
+      <div>
+        <span class="badge">Researcher view</span>
+        <h1>FDW eService — SUS Results Dashboard</h1>
+        <div class="sub">Consolidated System Usability Scale responses for Work Permit transactions for domestic helpers and confinement nannies.</div>
+      </div>
+      <a href="SUS Survey.html?preview=1" class="survey-link">Preview survey questions →</a>
+    </header>
+
+    <div class="toolbar">
+      <div class="left">
+        <strong style="font-size:15px;">Filters</strong>
+        <span style="font-size:13px;color:var(--muted);" id="dashCount">— responses</span>
+      </div>
+      <div class="right">
+        <select id="filterResidency" title="Filter by residency"><option value="">All residency</option></select>
+        <select id="filterScheme" title="Filter by scheme"><option value="">All schemes</option></select>
+        <select id="filterEA" title="Filter by EA use"><option value="">All EA statuses</option></select>
+        <select id="filterValidity" title="Validity">
+          <option value="">All responses</option>
+          <option value="valid">Valid only (exclude EA-completed)</option>
+          <option value="flagged">Flagged only</option>
+        </select>
+      </div>
+    </div>
+
+    <div id="dashContent"></div>
+
+    <div class="toolbar" style="margin-top:18px;">
+      <div class="left">
+        <button type="button" class="tool" id="seedBtn" title="Add demo data for preview">Add demo data</button>
+      </div>
+      <div class="right">
+        <button type="button" class="tool" id="exportAllCsvBtn">Export filtered (CSV)</button>
+        <button type="button" class="tool primary" id="printReportBtn">Print / PDF report</button>
+        <button type="button" class="tool danger" id="clearAllBtn">Clear all responses</button>
+      </div>
+    </div>
+
+    <p class="footer-note">SUS is a 10-item Likert questionnaire (Brooke, 1996). Scores are 0–100; not a percentage. Responses are stored locally in this browser.</p>
+  </div>
+
+</div>
+
+<script>
+/* ---------- Constants ---------- */
+const SYSTEM_NAME = "Work Permit transactions for domestic helpers and confinement nannies (FDW eService)";
+const SUS_ITEMS = [
+  { id: 1,  dim: "Frequency",     text: `I think that I would like to use ${SYSTEM_NAME} again for future needs.` },
+  { id: 2,  dim: "Complexity",    text: `I found ${SYSTEM_NAME} unnecessarily complex.` },
+  { id: 3,  dim: "Ease of Use",   text: `I thought ${SYSTEM_NAME} was easy to use.` },
+  { id: 4,  dim: "Support",       text: `I think that I would need the support of a technical person to be able to use ${SYSTEM_NAME}.` },
+  { id: 5,  dim: "Integration",   text: `I found the various functions in ${SYSTEM_NAME} were well integrated.` },
+  { id: 6,  dim: "Inconsistency", text: `I thought there was too much inconsistency in ${SYSTEM_NAME}.` },
+  { id: 7,  dim: "Learnability",  text: `I would imagine that most people would learn to use ${SYSTEM_NAME} very quickly.` },
+  { id: 8,  dim: "Cumbersome",    text: `I found ${SYSTEM_NAME} very cumbersome to use.` },
+  { id: 9,  dim: "Confidence",    text: `I felt very confident using ${SYSTEM_NAME}.` },
+  { id: 10, dim: "Knowledge",     text: `I needed to learn a lot of things before I could get going with ${SYSTEM_NAME}.` }
+];
+const STORAGE_KEY = 'fdw_sus_responses_v1';
+const AUTH_KEY = 'fdw_sus_researcher_auth';
+const ACCESS_PASS = 'research'; // simple soft-gate; not real auth
+
+/* ---------- Auth gate ---------- */
+function tryUnlock(pass) {
+  if (pass === ACCESS_PASS) {
+    sessionStorage.setItem(AUTH_KEY, '1');
+    showDashboard();
+    return true;
+  }
+  return false;
+}
+function showDashboard() {
+  document.getElementById('gateScreen').style.display = 'none';
+  document.getElementById('dashboardScreen').classList.add('show');
+  renderDashboard();
+}
+function lockDashboard() {
+  sessionStorage.removeItem(AUTH_KEY);
+  document.getElementById('dashboardScreen').classList.remove('show');
+  document.getElementById('gateScreen').style.display = 'block';
+  document.getElementById('gatePass').value = '';
+  document.getElementById('gateErr').textContent = '';
+}
+
+document.getElementById('gateBtn').addEventListener('click', () => {
+  const v = document.getElementById('gatePass').value.trim();
+  if (!tryUnlock(v)) document.getElementById('gateErr').textContent = 'Incorrect passphrase. Try again.';
+});
+document.getElementById('gatePass').addEventListener('keydown', (e) => {
+  if (e.key === 'Enter') document.getElementById('gateBtn').click();
+});
+
+/* ---------- Data ---------- */
+// In-memory cache so we don't re-parse 3.5MB of JSON on every filter change.
+// Invalidated when we know writes happened (currently: clear, seed demo data).
+let _responsesCache = null;
+function loadResponses() {
+  if (_responsesCache) return _responsesCache;
+  try {
+    const data = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+    if (!Array.isArray(data)) { _responsesCache = []; return _responsesCache; }
+    // Filter out any malformed records (e.g. from older versions or test probes)
+    _responsesCache = data.filter(r => r && r.screener && r.sus_responses && typeof r.sus_score === 'number');
+    return _responsesCache;
+  } catch (e) { _responsesCache = []; return _responsesCache; }
+}
+function invalidateResponsesCache() { _responsesCache = null; }
+function clearResponses() { localStorage.removeItem(STORAGE_KEY); invalidateResponsesCache(); }
+
+/* ---------- Math ---------- */
+const avg = nums => nums.length ? nums.reduce((a,b)=>a+b,0) / nums.length : 0;
+const median = nums => {
+  if (!nums.length) return 0;
+  const s = [...nums].sort((a,b)=>a-b);
+  const m = Math.floor(s.length/2);
+  return s.length % 2 ? s[m] : (s[m-1]+s[m])/2;
+};
+const stddev = nums => {
+  if (nums.length < 2) return 0;
+  const m = avg(nums);
+  return Math.sqrt(avg(nums.map(n => (n-m)**2)));
+};
+
+function gradeFor(score) {
+  if (score >= 80.3) return { letter: 'A', label: 'Excellent', cls: 'grade-A', pill: 'pill-A' };
+  if (score >= 74)   return { letter: 'B', label: 'Good',      cls: 'grade-B', pill: 'pill-B' };
+  if (score >= 68)   return { letter: 'C', label: 'Above avg', cls: 'grade-C', pill: 'pill-C' };
+  if (score >= 51)   return { letter: 'D', label: 'Marginal',  cls: 'grade-D', pill: 'pill-D' };
+  return { letter: 'F', label: 'Poor', cls: 'grade-F', pill: 'pill-F' };
+}
+
+/* ---------- Filters ---------- */
+function populateFilterOptions(responses) {
+  const fill = (id, vals) => {
+    const sel = document.getElementById(id);
+    const current = sel.value;
+    const first = sel.querySelector('option');
+    sel.innerHTML = '';
+    sel.appendChild(first);
+    [...new Set(vals)].sort().forEach(v => {
+      const o = document.createElement('option');
+      o.value = v; o.textContent = v;
+      sel.appendChild(o);
+    });
+    sel.value = current;
+  };
+  fill('filterResidency', responses.map(r => r.screener.residency));
+  fill('filterScheme', responses.map(r => r.screener.scheme));
+  fill('filterEA', responses.map(r => r.screener.ea_used));
+}
+function applyFilters(all) {
+  const fR = document.getElementById('filterResidency').value;
+  const fS = document.getElementById('filterScheme').value;
+  const fE = document.getElementById('filterEA').value;
+  const fV = document.getElementById('filterValidity').value;
+  return all.filter(r => {
+    if (fR && r.screener.residency !== fR) return false;
+    if (fS && r.screener.scheme !== fS) return false;
+    if (fE && r.screener.ea_used !== fE) return false;
+    const flagged = r.screener.ea_used === 'Yes (EA did it for me)';
+    if (fV === 'valid' && flagged) return false;
+    if (fV === 'flagged' && !flagged) return false;
+    return true;
+  });
+}
+
+/* ---------- Pagination state for responses table ---------- */
+const PAGE_SIZE = 100;
+let currentPage = 1;
+
+/* ---------- Render ---------- */
+function renderDashboard() {
+  const all = loadResponses();
+  populateFilterOptions(all);
+  const filtered = applyFilters(all);
+
+  document.getElementById('dashCount').textContent =
+    `${filtered.length} response${filtered.length===1?'':'s'}` +
+    (all.length !== filtered.length ? ` (filtered from ${all.length})` : '');
+
+  const content = document.getElementById('dashContent');
+
+  if (!filtered.length) {
+    content.innerHTML = `
+      <div class="panel empty-state">
+        <strong>${all.length ? 'No responses match the current filters' : 'No responses yet'}</strong>
+        ${all.length
+          ? 'Try clearing filters above.'
+          : 'Share the participant survey link to collect responses, or click <em>Add demo data</em> below to preview the dashboard.'}
+      </div>`;
+    return;
+  }
+
+  const scores = filtered.map(r => r.sus_score);
+  const meanScore = avg(scores);
+  const medianScore = median(scores);
+  const sd = stddev(scores);
+  const minScore = Math.min(...scores);
+  const maxScore = Math.max(...scores);
+
+  const gradeCounts = { A: 0, B: 0, C: 0, D: 0, F: 0 };
+  filtered.forEach(r => gradeCounts[gradeFor(r.sus_score).letter]++);
+
+  const itemAvgs = SUS_ITEMS.map(item => {
+    const responses = filtered.map(r => r.sus_responses[`Q${item.id}`]);
+    return {
+      ...item,
+      avgResp: avg(responses),
+      contrib: avg(responses.map(v => item.id % 2 === 1 ? v - 1 : 5 - v))
+    };
+  });
+
+  const dist = (key) => {
+    const counts = {};
+    filtered.forEach(r => { const v = r.screener[key]; counts[v] = (counts[v] || 0) + 1; });
+    return counts;
+  };
+
+  const overallGrade = gradeFor(meanScore);
+  const flaggedCount = filtered.filter(r => r.screener.ea_used === 'Yes (EA did it for me)').length;
+
+  content.innerHTML = `
+    <div class="stats-grid">
+      <div class="stat">
+        <div class="label">Mean SUS<span class="info" data-tip="The average SUS score across all filtered responses. The mean is the standard headline metric for SUS — compare it to the industry average of ≈ 68."></span></div>
+        <div class="value" style="color:var(--accent);">${meanScore.toFixed(1)}</div>
+        <div class="sub2"><span class="grade-pill ${overallGrade.pill}">${overallGrade.letter} — ${overallGrade.label}</span></div>
+      </div>
+      <div class="stat">
+        <div class="label">Median<span class="info" data-tip="The middle score when responses are sorted. Less affected by outliers than the mean. If median ≫ mean, a few very low scores are dragging the average down."></span></div>
+        <div class="value">${medianScore.toFixed(1)}</div>
+        <div class="sub2">vs. industry avg ≈ 68</div>
+      </div>
+      <div class="stat">
+        <div class="label">Score consistency<span class="info" data-tip="Standard deviation — the average distance of each score from the mean. Lower (e.g. ±5) = responses agree closely. Higher (e.g. ±20) = responses are spread out / mixed opinions about the system."></span></div>
+        <div class="value">±${sd.toFixed(1)}</div>
+        <div class="sub2">${sd < 10 ? 'responses agree' : sd < 18 ? 'mixed opinions' : 'wide disagreement'}</div>
+      </div>
+      <div class="stat">
+        <div class="label">Range<span class="info" data-tip="The lowest and highest individual SUS scores in the filtered set. A wide range alongside high score consistency means most responses cluster, but a few outliers exist."></span></div>
+        <div class="value">${minScore.toFixed(0)}–${maxScore.toFixed(0)}</div>
+        <div class="sub2">min – max</div>
+      </div>
+      <div class="stat">
+        <div class="label">Possibly invalid<span class="info" data-tip="Responses where the participant said an Employment Agency (EA) handled the application for them. These users may not have interacted with the system enough to rate it validly. Use the 'Valid only' filter above to exclude them."></span></div>
+        <div class="value">${flaggedCount}</div>
+        <div class="sub2">EA did the application (${filtered.length ? Math.round(flaggedCount/filtered.length*100) : 0}% of responses)</div>
+      </div>
+    </div>
+
+    <div class="grid-2">
+      <div class="panel">
+        <h3>Per-item score (higher = better, max 4)<span class="info" data-tip="SUS uses a 1–5 Likert scale, but each question contributes 0–4 points to the final SUS score (sum × 2.5 = score out of 100). Positive items (1, 3, 5, 7, 9): score = response − 1. Negative items (2, 4, 6, 8, 10): score = 5 − response. Either way, 4 = best, 0 = worst."></span></h3>
+        ${itemAvgs.map(it => `
+          <div class="qbar">
+            <div class="qrow">
+              <span class="qnum">${it.id}.</span>
+              <span class="qtext">${it.text}</span>
+            </div>
+            <div class="qscorerow">
+              <div class="qbar-wrap"><div class="qbar-fill" style="width:${(it.contrib/4*100).toFixed(1)}%;"></div></div>
+              <span class="qbar-val">${it.contrib.toFixed(2)} / 4</span>
+            </div>
+          </div>
+        `).join('')}
+        <p style="font-size:11px;color:var(--muted);margin:10px 0 0;line-height:1.5;">
+          Low bars indicate weak points in the system — candidates for redesign. Hover the <span class="info" data-tip="Detailed scoring explanation appears here on hover." style="position:relative;top:-1px;"></span> icon above for the full scoring formula.
+        </p>
+      </div>
+
+      <div class="panel">
+        <h3>Grade distribution<span class="info" data-tip="How many responses fell into each SUS grade band. A: ≥ 80.3 (Excellent). B: 74–80.3 (Good). C: 68–74 (Above avg, near industry baseline). D: 51–68 (Marginal). F: < 51 (Poor). Based on Bangor, Kortum & Miller (2009)."></span></h3>
+        ${['A','B','C','D','F'].map(g => {
+          const n = gradeCounts[g];
+          const pct = filtered.length ? (n/filtered.length*100) : 0;
+          return `
+            <div class="item-bar">
+              <span class="num ${g==='A'?'grade-A':g==='B'?'grade-B':g==='C'?'grade-C':g==='D'?'grade-D':'grade-F'}">${g}</span>
+              <div class="bar-wrap"><div class="bar-fill" style="width:${pct}%;"></div></div>
+              <span class="val">${n} (${pct.toFixed(0)}%)</span>
+            </div>`;
+        }).join('')}
+
+        <h3 style="margin-top:22px;">Respondent profile<span class="info" data-tip="Breakdown of who answered the survey, by the three screener questions. Use this to check sample balance — e.g. if 90% of responses are from one residency type, results may not generalise."></span></h3>
+        <div style="display:grid;grid-template-columns:1fr;gap:14px;">
+          <div>
+            <div style="font-size:11px;color:var(--muted);margin-bottom:4px;font-weight:600;text-transform:uppercase;letter-spacing:.05em;">Residency</div>
+            <table class="dist-table">${Object.entries(dist('residency')).map(([k,v]) => `<tr><td>${k}</td><td class="num">${v}</td></tr>`).join('')}</table>
+          </div>
+          <div>
+            <div style="font-size:11px;color:var(--muted);margin-bottom:4px;font-weight:600;text-transform:uppercase;letter-spacing:.05em;">Scheme</div>
+            <table class="dist-table">${Object.entries(dist('scheme')).map(([k,v]) => `<tr><td>${k}</td><td class="num">${v}</td></tr>`).join('')}</table>
+          </div>
+          <div>
+            <div style="font-size:11px;color:var(--muted);margin-bottom:4px;font-weight:600;text-transform:uppercase;letter-spacing:.05em;">EA usage</div>
+            <table class="dist-table">${Object.entries(dist('ea_used')).map(([k,v]) => `<tr><td>${k}</td><td class="num">${v}</td></tr>`).join('')}</table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <h3>Summary report<span class="info" data-tip="Auto-generated narrative summary of the filtered responses. Updates live as you change filters above. Use the Print / PDF report button to export this view."></span></h3>
+      <p class="summary-text">
+        Across <strong>${filtered.length}</strong> response${filtered.length===1?'':'s'},
+        the FDW eService scored a mean SUS of <strong>${meanScore.toFixed(1)}</strong>
+        (median ${medianScore.toFixed(1)}, SD ${sd.toFixed(1)}),
+        corresponding to grade <strong>${overallGrade.letter} — ${overallGrade.label}</strong>.
+        ${meanScore >= 68
+          ? 'This is at or above the industry average of ≈ 68.'
+          : 'This is below the industry average of ≈ 68, indicating room for usability improvement.'}
+      </p>
+      <p class="summary-text">
+        <strong>Strongest items:</strong>
+        ${[...itemAvgs].sort((a,b)=>b.contrib-a.contrib).slice(0,2).map(i => `${i.dim} (${i.contrib.toFixed(2)})`).join(', ')}.<br>
+        <strong>Weakest items (redesign targets):</strong>
+        ${[...itemAvgs].sort((a,b)=>a.contrib-b.contrib).slice(0,2).map(i => `${i.dim} (${i.contrib.toFixed(2)})`).join(', ')}.
+      </p>
+      ${flaggedCount > 0 ? `<p style="font-size:13px;color:var(--muted);margin:0;">Note: ${flaggedCount} response${flaggedCount===1?' was':'s were'} flagged because the EA completed the application on the user's behalf. Use the "Valid only" filter for the cleanest signal.</p>` : ''}
+    </div>
+
+    <div class="panel">
+      <h3>Individual responses (${filtered.length})<span class="info" data-tip="Raw response data — one row per submission. Q1–Q10 are the participant's 1–5 Likert answers (not the scored 0–4 contribution). 'Validity = flagged' means an EA completed the application on the participant's behalf."></span></h3>
+      ${(() => {
+        const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
+        if (currentPage > totalPages) currentPage = totalPages;
+        const startIdx = (currentPage - 1) * PAGE_SIZE;
+        const endIdx = Math.min(startIdx + PAGE_SIZE, filtered.length);
+        // Render newest first — reverse iteration without copying the whole array.
+        const pageRows = [];
+        for (let i = filtered.length - 1 - startIdx; i >= filtered.length - endIdx; i--) {
+          pageRows.push(filtered[i]);
+        }
+        const paginationBar = filtered.length > PAGE_SIZE ? `
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;font-size:13px;color:var(--muted);">
+            <span>Showing ${startIdx + 1}–${endIdx} of ${filtered.length}</span>
+            <div style="display:flex;gap:6px;align-items:center;">
+              <button type="button" class="tool" data-page="first" ${currentPage===1?'disabled':''}>« First</button>
+              <button type="button" class="tool" data-page="prev" ${currentPage===1?'disabled':''}>‹ Prev</button>
+              <span style="padding:0 8px;">Page ${currentPage} of ${totalPages}</span>
+              <button type="button" class="tool" data-page="next" ${currentPage===totalPages?'disabled':''}>Next ›</button>
+              <button type="button" class="tool" data-page="last" ${currentPage===totalPages?'disabled':''}>Last »</button>
+            </div>
+          </div>
+        ` : '';
+        return `
+        ${paginationBar}
+        <div class="responses-scroll">
+          <table class="responses-table">
+            <thead>
+              <tr>
+                <th>Timestamp</th><th>Residency</th><th>Scheme</th><th>EA</th>
+                ${SUS_ITEMS.map(i => `<th class="num" title="${i.text}">Q${i.id}</th>`).join('')}
+                <th class="num">SUS</th><th>Grade</th><th>Validity</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${pageRows.map(r => {
+                const g = gradeFor(r.sus_score);
+                const flagged = r.screener.ea_used === 'Yes (EA did it for me)';
+                return `
+                  <tr>
+                    <td>${new Date(r.timestamp).toLocaleString()}</td>
+                    <td>${r.screener.residency}</td>
+                    <td>${r.screener.scheme}</td>
+                    <td>${r.screener.ea_used}</td>
+                    ${SUS_ITEMS.map(i => `<td class="num">${r.sus_responses[`Q${i.id}`]}</td>`).join('')}
+                    <td class="num"><strong>${r.sus_score.toFixed(1)}</strong></td>
+                    <td class="${g.cls}">${g.letter}</td>
+                    <td>${flagged ? '<span class="flag-pill">flagged</span>' : 'OK'}</td>
+                  </tr>`;
+              }).join('')}
+            </tbody>
+          </table>
+        </div>
+        ${paginationBar}
+        `;
+      })()}
+    </div>
+  `;
+}
+
+/* ---------- Filters change handler ---------- */
+['filterResidency','filterScheme','filterEA','filterValidity'].forEach(id => {
+  document.getElementById(id).addEventListener('change', () => {
+    currentPage = 1; // reset to first page when filters change
+    renderDashboard();
+  });
+});
+
+/* ---------- Pagination clicks (delegated, since buttons are re-rendered) ---------- */
+document.getElementById('dashContent').addEventListener('click', (e) => {
+  const btn = e.target.closest('button[data-page]');
+  if (!btn) return;
+  const all = loadResponses();
+  const filteredCount = applyFilters(all).length;
+  const totalPages = Math.max(1, Math.ceil(filteredCount / PAGE_SIZE));
+  const action = btn.dataset.page;
+  if (action === 'first') currentPage = 1;
+  else if (action === 'prev') currentPage = Math.max(1, currentPage - 1);
+  else if (action === 'next') currentPage = Math.min(totalPages, currentPage + 1);
+  else if (action === 'last') currentPage = totalPages;
+  renderDashboard();
+});
+
+/* ---------- Export CSV ---------- */
+document.getElementById('exportAllCsvBtn').addEventListener('click', () => {
+  const all = applyFilters(loadResponses());
+  if (!all.length) { alert('No responses to export.'); return; }
+  const headers = ['id','timestamp','residency','scheme','ea_used',
+    ...SUS_ITEMS.map(i => `Q${i.id}: ${i.text}`),
+    'sus_score','grade','validity_flag'];
+  const escape = v => `"${String(v ?? '').replace(/"/g,'""')}"`;
+  const rows = all.map(r => [
+    r.id, r.timestamp, r.screener.residency, r.screener.scheme, r.screener.ea_used,
+    ...SUS_ITEMS.map(i => r.sus_responses[`Q${i.id}`]),
+    r.sus_score, gradeFor(r.sus_score).letter, r.validity_flag
+  ]);
+  const csv = [headers.map(escape).join(','), ...rows.map(row => row.map(escape).join(','))].join('\n');
+  const blob = new Blob([csv], {type:'text/csv'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = `fdw-sus-responses-${Date.now()}.csv`;
+  document.body.appendChild(a); a.click(); a.remove();
+  URL.revokeObjectURL(url);
+});
+
+/* ---------- Print ---------- */
+document.getElementById('printReportBtn').addEventListener('click', () => window.print());
+
+/* ---------- Clear ---------- */
+document.getElementById('clearAllBtn').addEventListener('click', (e) => {
+  const btn = e.currentTarget;
+  if (btn.dataset.confirming !== '1') {
+    btn.dataset.confirming = '1';
+    btn.textContent = 'Click again to permanently delete';
+    setTimeout(() => {
+      btn.dataset.confirming = '0';
+      btn.textContent = 'Clear all responses';
+    }, 3500);
+    return;
+  }
+  btn.dataset.confirming = '0';
+  btn.textContent = 'Clear all responses';
+  clearResponses();
+  // Also clear the participant submission lockout so the same browser can re-test
+  localStorage.removeItem('fdw_sus_submitted_v1');
+  renderDashboard();
+});
+
+/* ---------- Demo data ---------- */
+document.getElementById('seedBtn').addEventListener('click', (e) => {
+  const btn = e.currentTarget;
+  if (btn.dataset.confirming !== '1') {
+    const original = btn.textContent;
+    btn.dataset.confirming = '1';
+    btn.textContent = 'Click again to add 12 demo responses';
+    btn.style.borderColor = 'var(--accent)';
+    btn.style.color = 'var(--accent)';
+    setTimeout(() => {
+      btn.dataset.confirming = '0';
+      btn.textContent = original;
+      btn.style.borderColor = '';
+      btn.style.color = '';
+    }, 3500);
+    return;
+  }
+  btn.dataset.confirming = '0';
+  btn.textContent = 'Add demo data';
+  btn.style.borderColor = '';
+  btn.style.color = '';
+  const residencies = ['Singapore Citizen','Permanent Resident','Foreigner (EP/SP/DP)'];
+  const schemes = ['Standard','Joint Income','Sponsorship'];
+  const eas = ['No (Self-Applied)','Mixed','Yes (EA did it for me)'];
+  const all = loadResponses();
+  for (let i = 0; i < 12; i++) {
+    const sus = {};
+    let total = 0;
+    SUS_ITEMS.forEach(item => {
+      const v = 1 + Math.floor(Math.random() * 5);
+      sus[`Q${item.id}`] = v;
+      total += item.id % 2 === 1 ? v - 1 : 5 - v;
+    });
+    const ea = eas[Math.floor(Math.random()*eas.length)];
+    all.push({
+      id: 'demo_' + Date.now() + '_' + i,
+      timestamp: new Date(Date.now() - Math.random()*30*86400000).toISOString(),
+      screener: {
+        residency: residencies[Math.floor(Math.random()*residencies.length)],
+        scheme: schemes[Math.floor(Math.random()*schemes.length)],
+        ea_used: ea
+      },
+      sus_responses: sus,
+      sus_score: Math.round(total * 2.5 * 10) / 10,
+      validity_flag: ea === 'Yes (EA did it for me)' ? 'EA-completed — direct system interaction may be insufficient' : 'OK'
+    });
+  }
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(all));
+  invalidateResponsesCache();
+  renderDashboard();
+});
+
+/* ---------- Auto-unlock if previously authed ---------- */
+if (sessionStorage.getItem(AUTH_KEY) === '1') showDashboard();
+</script>
+</body>
+</html>
