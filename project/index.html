@@ -114,9 +114,17 @@
     .likert-row label { padding: 10px 2px; font-size: 11px; }
   }
 </style>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@govtechsg/sgds-web-component@3.17.0/themes/day.css" />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@govtechsg/sgds-web-component@3.17.0/css/sgds.css" />
+<script src="https://cdn.jsdelivr.net/npm/@govtechsg/sgds-web-component@3.17.0/components/Masthead/index.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@govtechsg/sgds-web-component@3.17.0/components/Input/index.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@govtechsg/sgds-web-component@3.17.0/components/Button/index.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@govtechsg/sgds-web-component@3.17.0/components/Alert/index.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@govtechsg/sgds-web-component@3.17.0/components/Badge/index.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@govtechsg/sgds-web-component@3.17.0/components/Footer/index.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@govtechsg/sgds-web-component@3.17.0/components/Link/index.umd.min.js"></script>
 </head>
 <body>
-<script src="https://cdn.jsdelivr.net/npm/@govtechsg/sgds-web-component@3.17.0"></script>
 <sgds-masthead></sgds-masthead>
 <div class="wrap">
 
@@ -224,7 +232,7 @@
 
       <div class="actions">
         <div class="status-msg" id="statusMsg">All questions are required.</div>
-        <sgds-button variant="primary" type="button" id="submitBtn">Submit response</sgds-button>
+        <sgds-button variant="primary" type="button" id="submitBtn" size="lg">Submit response</sgds-button>
       </div>
     </form>
   </div>
@@ -248,25 +256,26 @@
 </div>
 
 <sgds-footer
-  title="Ministry of Manpower"
-  description="FDW eService — Work Permit transactions for domestic helpers and confinement nannies. This survey is conducted to improve the usability of the service."
-  lastUpdatedDate="April 2026"
-></sgds-footer>
+  contacthref="https://www.mom.gov.sg/contact-us"
+  feedbackhref="https://www.mom.gov.sg/efeedback"
+  privacyhref="https://www.mom.gov.sg/privacy-statement"
+  termsofusehref="https://www.mom.gov.sg/terms-of-use"
+>
+  <h2 slot="title">Ministry of Manpower</h2>
+  <p slot="description">FDW eService — Work Permit transactions for domestic helpers and confinement nannies. This survey is conducted to improve the usability of the service.</p>
+  <sgds-footer-item slot="items">
+    <div slot="title">Useful Links</div>
+    <sgds-link><a href="https://www.mom.gov.sg" target="_blank">MOM Website</a></sgds-link>
+    <sgds-link><a href="https://www.mom.gov.sg/passes-and-permits/work-permit-for-foreign-domestic-worker" target="_blank">Work Permit for FDW</a></sgds-link>
+  </sgds-footer-item>
+  <sgds-footer-item slot="items">
+    <div slot="title">Contact</div>
+    <sgds-link><a href="https://www.mom.gov.sg/contact-us" target="_blank">Contact MOM</a></sgds-link>
+    <sgds-link><a href="https://tech.gov.sg/report-vulnerability" target="_blank">Report Vulnerability</a></sgds-link>
+  </sgds-footer-item>
+</sgds-footer>
 
 <script>
-const sgdsFooter = document.querySelector('sgds-footer');
-if (sgdsFooter) {
-  sgdsFooter.links = [
-    { title: "Useful Links", links: [
-      { href: "https://www.mom.gov.sg", label: "MOM Website" },
-      { href: "https://www.mom.gov.sg/passes-and-permits/work-permit-for-foreign-domestic-worker", label: "Work Permit for FDW" }
-    ]},
-    { title: "Contact", links: [
-      { href: "https://www.mom.gov.sg/contact-us", label: "Contact MOM" },
-      { href: "https://tech.gov.sg/report-vulnerability", label: "Report Vulnerability" }
-    ]}
-  ];
-}
 
 const SYSTEM_NAME = "Work Permit transactions for domestic helpers and confinement nannies (FDW eService)";
 const SUS_ITEMS = [
