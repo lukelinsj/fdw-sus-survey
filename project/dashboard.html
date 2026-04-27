@@ -265,11 +265,10 @@
   <!-- ========= AUTH GATE ========= -->
   <div class="gate" id="gateScreen">
     <h2>Researcher access</h2>
-    <p>This dashboard is for researchers only. Enter the access passphrase to continue.</p>
-    <input type="password" id="gatePass" placeholder="Passphrase" autocomplete="off" />
+    <p>This dashboard is for authorised MOM researchers only. Sign in with your <code>@mom.gov.sg</code> email to continue.</p>
+    <input type="email" id="gateEmail" placeholder="name@mom.gov.sg" autocomplete="email" />
     <div class="err" id="gateErr"></div>
     <button id="gateBtn">Unlock dashboard</button>
-    <div class="hint">Default passphrase: <code>research</code></div>
   </div>
 
   <!-- ========= DASHBOARD ========= -->
@@ -373,16 +372,19 @@ const SUS_ITEMS = [
 ];
 const STORAGE_KEY = 'fdw_sus_responses_v1';
 const AUTH_KEY = 'fdw_sus_researcher_auth';
-const ACCESS_PASS = 'research'; // simple soft-gate; not real auth
+const AUTH_EMAIL_KEY = 'fdw_sus_researcher_email';
+const ALLOWED_EMAIL_DOMAIN = '@mom.gov.sg';
+const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 /* ---------- Auth gate ---------- */
-function tryUnlock(pass) {
-  if (pass === ACCESS_PASS) {
-    sessionStorage.setItem(AUTH_KEY, '1');
-    showDashboard();
-    return true;
-  }
-  return false;
+function tryUnlock(email) {
+  const e = (email || '').trim().toLowerCase();
+  if (!EMAIL_RE.test(e)) return { ok: false, error: 'Please enter a valid email address.' };
+  if (!e.endsWith(ALLOWED_EMAIL_DOMAIN)) return { ok: false, error: 'Access is restricted to ' + ALLOWED_EMAIL_DOMAIN + ' email addresses.' };
+  sessionStorage.setItem(AUTH_KEY, '1');
+  sessionStorage.setItem(AUTH_EMAIL_KEY, e);
+  showDashboard();
+  return { ok: true };
 }
 function showDashboard() {
   document.getElementById('gateScreen').style.display = 'none';
@@ -391,17 +393,19 @@ function showDashboard() {
 }
 function lockDashboard() {
   sessionStorage.removeItem(AUTH_KEY);
+  sessionStorage.removeItem(AUTH_EMAIL_KEY);
   document.getElementById('dashboardScreen').classList.remove('show');
   document.getElementById('gateScreen').style.display = 'block';
-  document.getElementById('gatePass').value = '';
+  document.getElementById('gateEmail').value = '';
   document.getElementById('gateErr').textContent = '';
 }
 
 document.getElementById('gateBtn').addEventListener('click', () => {
-  const v = document.getElementById('gatePass').value.trim();
-  if (!tryUnlock(v)) document.getElementById('gateErr').textContent = 'Incorrect passphrase. Try again.';
+  const v = document.getElementById('gateEmail').value;
+  const result = tryUnlock(v);
+  if (!result.ok) document.getElementById('gateErr').textContent = result.error;
 });
-document.getElementById('gatePass').addEventListener('keydown', (e) => {
+document.getElementById('gateEmail').addEventListener('keydown', (e) => {
   if (e.key === 'Enter') document.getElementById('gateBtn').click();
 });
 
