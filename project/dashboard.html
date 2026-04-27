@@ -131,7 +131,44 @@
   .qbar .qbar-fill { height: 100%; background: var(--accent); border-radius: 3px; transition: width .3s ease; }
   .qbar .qbar-val { font-size: 12px; font-variant-numeric: tabular-nums; color: var(--muted); text-align: right; }
 
-  .footer-note { margin-top: 32px; font-size: 12px; color: var(--muted); text-align: center; }
+  /* SGDS-styled official government banner (fallback) */
+  .sgds-masthead {
+    background: #f0f0f0;
+    border-bottom: 1px solid #d9d9d9;
+    padding: 6px 0;
+    font-size: 12px;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+    position: relative; z-index: 100;
+  }
+  .sgds-masthead__inner { max-width: 1200px; margin: 0 auto; padding: 0 24px; display: flex; align-items: center; gap: 8px; }
+  .sgds-masthead__link { display: flex; align-items: center; gap: 6px; color: #484848; text-decoration: none; }
+  .sgds-masthead__link:hover { text-decoration: underline; }
+
+  /* SGDS-styled footer */
+  .sgds-footer {
+    background: #1a1a1a; color: #d9d9d9;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+    font-size: 14px; margin-top: 48px;
+  }
+  .sgds-footer__top { padding: 40px 0 28px; border-bottom: 1px solid #333; }
+  .sgds-footer__inner { max-width: 1200px; margin: 0 auto; padding: 0 24px; }
+  .sgds-footer__grid { display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 32px; }
+  .sgds-footer__brand-name { color: #fff; font-size: 16px; font-weight: 600; margin: 0 0 8px; }
+  .sgds-footer__description { color: #aaa; font-size: 13px; margin: 0 0 16px; line-height: 1.5; }
+  .sgds-footer__col-title { color: #fff; font-size: 12px; text-transform: uppercase; letter-spacing: .08em; font-weight: 600; margin: 0 0 10px; }
+  .sgds-footer__links { list-style: none; margin: 0; padding: 0; }
+  .sgds-footer__links li { margin-bottom: 8px; }
+  .sgds-footer__links a { color: #aaa; text-decoration: none; font-size: 13px; }
+  .sgds-footer__links a:hover { color: #fff; text-decoration: underline; }
+  .sgds-footer__bottom { padding: 16px 0; }
+  .sgds-footer__bottom-inner {
+    max-width: 1200px; margin: 0 auto; padding: 0 24px;
+    display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;
+  }
+  .sgds-footer__bottom-links { display: flex; gap: 16px; flex-wrap: wrap; }
+  .sgds-footer__bottom-links a { color: #888; font-size: 12px; text-decoration: none; }
+  .sgds-footer__bottom-links a:hover { color: #fff; text-decoration: underline; }
+  .sgds-footer__copyright { color: #666; font-size: 12px; }
 
   /* ---- Reusable tooltip icon ---- */
   .info {
@@ -200,10 +237,29 @@
 
   @media (max-width: 600px) {
     .wrap { padding: 20px 14px 60px; }
+    .sgds-footer__grid { grid-template-columns: 1fr; gap: 24px; }
+    .sgds-footer__bottom-inner { flex-direction: column; align-items: flex-start; }
   }
 </style>
+<!-- SGDS web component: official government banner -->
+<script src="https://cdn.jsdelivr.net/npm/@govtechsg/sgds-web-component@2.3.3/components/Masthead/index.umd.js" onerror="document.getElementById('sgdsMastheadFallback').style.display='block'"></script>
 </head>
 <body>
+<!-- SGDS Official Government Banner -->
+<sgds-masthead></sgds-masthead>
+<!-- Fallback banner (shown only if web component fails to load) -->
+<div id="sgdsMastheadFallback" class="sgds-masthead" style="display:none;">
+  <div class="sgds-masthead__inner">
+    <svg width="20" height="20" viewBox="0 0 72 60" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      <path d="M36 0C27.8 0 21 6.8 21 15s6.8 15 15 15 15-6.8 15-15S44.2 0 36 0z" fill="#DB0000"/>
+      <path d="M0 30h72v30H0z" fill="#DB0000"/>
+      <path d="M0 0h72v30H0z" fill="#fff"/>
+    </svg>
+    <a href="https://www.gov.sg" class="sgds-masthead__link" target="_blank" rel="noopener noreferrer">
+      A Singapore Government Agency Website
+    </a>
+  </div>
+</div>
 <div class="wrap">
 
   <!-- ========= AUTH GATE ========= -->
@@ -224,7 +280,7 @@
         <h1>FDW eService — SUS Results Dashboard</h1>
         <div class="sub">Consolidated System Usability Scale responses for Work Permit transactions for domestic helpers and confinement nannies.</div>
       </div>
-      <a href="SUS Survey.html?preview=1" class="survey-link">Preview survey questions →</a>
+      <a href="/?preview=1" class="survey-link">Preview survey questions →</a>
     </header>
 
     <div class="toolbar">
@@ -261,6 +317,44 @@
   </div>
 
 </div>
+
+<!-- SGDS Footer -->
+<footer class="sgds-footer" role="contentinfo">
+  <div class="sgds-footer__top">
+    <div class="sgds-footer__inner">
+      <div class="sgds-footer__grid">
+        <div>
+          <p class="sgds-footer__brand-name">Ministry of Manpower</p>
+          <p class="sgds-footer__description">FDW eService — Researcher Dashboard for SUS usability study on Work Permit transactions for domestic helpers and confinement nannies.</p>
+        </div>
+        <div>
+          <p class="sgds-footer__col-title">Useful Links</p>
+          <ul class="sgds-footer__links">
+            <li><a href="https://www.mom.gov.sg" target="_blank" rel="noopener noreferrer">MOM Website</a></li>
+            <li><a href="https://www.mom.gov.sg/passes-and-permits/work-permit-for-foreign-domestic-worker" target="_blank" rel="noopener noreferrer">Work Permit for FDW</a></li>
+          </ul>
+        </div>
+        <div>
+          <p class="sgds-footer__col-title">Contact</p>
+          <ul class="sgds-footer__links">
+            <li><a href="https://www.mom.gov.sg/contact-us" target="_blank" rel="noopener noreferrer">Contact MOM</a></li>
+            <li><a href="https://tech.gov.sg/report-vulnerability" target="_blank" rel="noopener noreferrer">Report Vulnerability</a></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="sgds-footer__bottom">
+    <div class="sgds-footer__bottom-inner">
+      <div class="sgds-footer__bottom-links">
+        <a href="https://www.mom.gov.sg/privacy-statement" target="_blank" rel="noopener noreferrer">Privacy Statement</a>
+        <a href="https://www.mom.gov.sg/terms-of-use" target="_blank" rel="noopener noreferrer">Terms of Use</a>
+        <a href="https://tech.gov.sg/report-vulnerability" target="_blank" rel="noopener noreferrer">Report Vulnerability</a>
+      </div>
+      <p class="sgds-footer__copyright">&copy; 2026 Government of Singapore. Last updated April 2026.</p>
+    </div>
+  </div>
+</footer>
 
 <script>
 /* ---------- Constants ---------- */
@@ -570,7 +664,7 @@ function renderDashboard() {
           <table class="responses-table">
             <thead>
               <tr>
-                <th>Timestamp</th><th>Residency</th><th>Scheme</th><th>EA</th>
+                <th>Timestamp</th><th>Full Name</th><th>Email</th><th>Mobile</th><th>Residency</th><th>Scheme</th><th>EA</th>
                 ${SUS_ITEMS.map(i => `<th class="num" title="${i.text}">Q${i.id}</th>`).join('')}
                 <th class="num">SUS</th><th>Grade</th><th>Validity</th>
               </tr>
@@ -579,9 +673,15 @@ function renderDashboard() {
               ${pageRows.map(r => {
                 const g = gradeFor(r.sus_score);
                 const flagged = r.screener.ea_used === 'Yes (EA did it for me)';
+                const name = r.contact?.full_name || '—';
+                const email = r.contact?.email || '—';
+                const phone = r.contact?.phone || '—';
                 return `
                   <tr>
                     <td>${new Date(r.timestamp).toLocaleString()}</td>
+                    <td>${name}</td>
+                    <td>${email}</td>
+                    <td>${phone}</td>
                     <td>${r.screener.residency}</td>
                     <td>${r.screener.scheme}</td>
                     <td>${r.screener.ea_used}</td>
@@ -628,12 +728,14 @@ document.getElementById('dashContent').addEventListener('click', (e) => {
 document.getElementById('exportAllCsvBtn').addEventListener('click', () => {
   const all = applyFilters(loadResponses());
   if (!all.length) { alert('No responses to export.'); return; }
-  const headers = ['id','timestamp','residency','scheme','ea_used',
+  const headers = ['id','timestamp','full_name','email','mobile','residency','scheme','ea_used',
     ...SUS_ITEMS.map(i => `Q${i.id}: ${i.text}`),
     'sus_score','grade','validity_flag'];
   const escape = v => `"${String(v ?? '').replace(/"/g,'""')}"`;
   const rows = all.map(r => [
-    r.id, r.timestamp, r.screener.residency, r.screener.scheme, r.screener.ea_used,
+    r.id, r.timestamp,
+    r.contact?.full_name || '', r.contact?.email || '', r.contact?.phone || '',
+    r.screener.residency, r.screener.scheme, r.screener.ea_used,
     ...SUS_ITEMS.map(i => r.sus_responses[`Q${i.id}`]),
     r.sus_score, gradeFor(r.sus_score).letter, r.validity_flag
   ]);

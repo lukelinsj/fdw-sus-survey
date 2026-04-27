@@ -118,21 +118,107 @@
 
   .form-screen.hidden { display: none; }
 
-  .footer-note { margin-top: 32px; font-size: 12px; color: var(--muted); text-align: center; }
-
   body.completed #surveyHeader { display: none; }
 
   #previewBanner.show { display: block !important; }
+
+  /* Text input fields for personal details */
+  .text-input-group input[type="text"],
+  .text-input-group input[type="email"],
+  .text-input-group input[type="tel"] {
+    width: 100%; max-width: 480px;
+    padding: 10px 12px;
+    border: 1px solid var(--line-strong);
+    border-radius: var(--radius);
+    font: inherit;
+    font-size: 15px;
+    background: var(--surface);
+    color: var(--ink);
+    transition: border-color .15s;
+  }
+  .text-input-group input:focus {
+    outline: none;
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(43,95,166,.12);
+  }
+  .text-input-group input.invalid { border-color: #b03030; }
+  .text-input-group input.invalid:focus { box-shadow: 0 0 0 3px rgba(176,48,48,.12); }
+  .field-error { font-size: 13px; color: #b03030; margin-top: 6px; min-height: 18px; }
+
+  /* SGDS-styled official government banner (fallback if web component unavailable) */
+  .sgds-masthead {
+    background: #f0f0f0;
+    border-bottom: 1px solid #d9d9d9;
+    padding: 6px 0;
+    font-size: 12px;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+    position: relative; z-index: 100;
+  }
+  .sgds-masthead__inner {
+    max-width: 1200px; margin: 0 auto; padding: 0 20px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .sgds-masthead__link {
+    display: flex; align-items: center; gap: 6px;
+    color: #484848; text-decoration: none;
+  }
+  .sgds-masthead__link:hover { text-decoration: underline; }
+
+  /* SGDS-styled footer */
+  .sgds-footer {
+    background: #1a1a1a; color: #d9d9d9;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+    font-size: 14px; margin-top: 48px;
+  }
+  .sgds-footer__top { padding: 40px 0 28px; border-bottom: 1px solid #333; }
+  .sgds-footer__inner { max-width: 1200px; margin: 0 auto; padding: 0 24px; }
+  .sgds-footer__grid { display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 32px; }
+  .sgds-footer__brand-name { color: #fff; font-size: 16px; font-weight: 600; margin: 0 0 8px; }
+  .sgds-footer__description { color: #aaa; font-size: 13px; margin: 0 0 16px; line-height: 1.5; }
+  .sgds-footer__col-title { color: #fff; font-size: 12px; text-transform: uppercase; letter-spacing: .08em; font-weight: 600; margin: 0 0 10px; }
+  .sgds-footer__links { list-style: none; margin: 0; padding: 0; }
+  .sgds-footer__links li { margin-bottom: 8px; }
+  .sgds-footer__links a { color: #aaa; text-decoration: none; font-size: 13px; }
+  .sgds-footer__links a:hover { color: #fff; text-decoration: underline; }
+  .sgds-footer__bottom { padding: 16px 0; }
+  .sgds-footer__bottom-inner {
+    max-width: 1200px; margin: 0 auto; padding: 0 24px;
+    display: flex; justify-content: space-between; align-items: center;
+    flex-wrap: wrap; gap: 12px;
+  }
+  .sgds-footer__bottom-links { display: flex; gap: 16px; flex-wrap: wrap; }
+  .sgds-footer__bottom-links a { color: #888; font-size: 12px; text-decoration: none; }
+  .sgds-footer__bottom-links a:hover { color: #fff; text-decoration: underline; }
+  .sgds-footer__copyright { color: #666; font-size: 12px; }
 
   @media (max-width: 560px) {
     .wrap { padding: 20px 14px 60px; }
     section.card { padding: 18px 16px; }
     .radio-group, .likert, .text-input-group { margin-left: 0; }
     .likert-row label { padding: 10px 2px; font-size: 11px; }
+    .sgds-footer__grid { grid-template-columns: 1fr; gap: 24px; }
+    .sgds-footer__bottom-inner { flex-direction: column; align-items: flex-start; }
   }
 </style>
+<!-- SGDS web component: official government banner -->
+<script src="https://cdn.jsdelivr.net/npm/@govtechsg/sgds-web-component@2.3.3/components/Masthead/index.umd.js" onerror="document.getElementById('sgdsMastheadFallback').style.display='block'"></script>
 </head>
 <body>
+<!-- SGDS Official Government Banner -->
+<sgds-masthead></sgds-masthead>
+<!-- Fallback banner (shown only if web component fails to load) -->
+<div id="sgdsMastheadFallback" class="sgds-masthead" style="display:none;">
+  <div class="sgds-masthead__inner">
+    <svg width="20" height="20" viewBox="0 0 72 60" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      <path d="M36 0C27.8 0 21 6.8 21 15s6.8 15 15 15 15-6.8 15-15S44.2 0 36 0z" fill="#DB0000"/>
+      <path d="M0 30h72v30H0z" fill="#DB0000"/>
+      <path d="M0 0h72v30H0z" fill="#fff"/>
+    </svg>
+    <a href="https://www.gov.sg" class="sgds-masthead__link" target="_blank" rel="noopener noreferrer">
+      A Singapore Government Agency Website
+    </a>
+  </div>
+</div>
 <div class="wrap">
 
   <header class="top" id="surveyHeader">
@@ -149,11 +235,50 @@
 
   <div id="previewBanner" style="display:none;background:var(--accent-soft);border:1px solid var(--accent);border-radius:var(--radius);padding:12px 16px;margin-bottom:18px;font-size:14px;color:var(--accent);">
     <strong>Preview mode</strong> — you're viewing the survey questions as a researcher. Submissions are disabled and your existing response (if any) is preserved.
-    <a href="Researcher Dashboard.html" style="color:var(--accent);float:right;">← Back to dashboard</a>
+    <a href="dashboard" style="color:var(--accent);float:right;">← Back to dashboard</a>
   </div>
 
   <div class="form-screen" id="formScreen">
     <form id="susForm" novalidate>
+
+      <!-- ============ PERSONAL DETAILS ============ -->
+      <section class="card">
+        <h2>Your Details</h2>
+        <p class="lead">Please provide your contact information so the research team can follow up if needed.</p>
+
+        <div class="question text-input-group" data-q="full_name">
+          <div class="q-label">
+            <span class="q-num">D1.</span>
+            <span class="q-text">Full name<span class="q-required">*</span></span>
+          </div>
+          <div style="margin-left:32px;">
+            <input type="text" id="full_name" name="full_name" placeholder="e.g. Tan Wei Ming" autocomplete="name" />
+            <div class="field-error" id="err_full_name"></div>
+          </div>
+        </div>
+
+        <div class="question text-input-group" data-q="email">
+          <div class="q-label">
+            <span class="q-num">D2.</span>
+            <span class="q-text">Email address<span class="q-required">*</span></span>
+          </div>
+          <div style="margin-left:32px;">
+            <input type="email" id="email" name="email" placeholder="e.g. tanweiming@email.com" autocomplete="email" />
+            <div class="field-error" id="err_email"></div>
+          </div>
+        </div>
+
+        <div class="question text-input-group" data-q="contact">
+          <div class="q-label">
+            <span class="q-num">D3.</span>
+            <span class="q-text">Mobile number<span class="q-required">*</span></span>
+          </div>
+          <div style="margin-left:32px;">
+            <input type="tel" id="contact" name="contact" placeholder="e.g. +65 9123 4567" autocomplete="tel" />
+            <div class="field-error" id="err_contact"></div>
+          </div>
+        </div>
+      </section>
 
       <!-- ============ SCREENER ============ -->
       <section class="card">
@@ -223,8 +348,45 @@
     <p>Thanks for taking part! You can only submit once.</p>
   </div>
 
-  <p class="footer-note">This is an anonymous usability survey. Responses are stored locally for the research team.</p>
 </div>
+
+<!-- SGDS Footer -->
+<footer class="sgds-footer" role="contentinfo">
+  <div class="sgds-footer__top">
+    <div class="sgds-footer__inner">
+      <div class="sgds-footer__grid">
+        <div>
+          <p class="sgds-footer__brand-name">Ministry of Manpower</p>
+          <p class="sgds-footer__description">FDW eService — Work Permit transactions for domestic helpers and confinement nannies. This survey is conducted to improve the usability of the service.</p>
+        </div>
+        <div>
+          <p class="sgds-footer__col-title">Useful Links</p>
+          <ul class="sgds-footer__links">
+            <li><a href="https://www.mom.gov.sg" target="_blank" rel="noopener noreferrer">MOM Website</a></li>
+            <li><a href="https://www.mom.gov.sg/passes-and-permits/work-permit-for-foreign-domestic-worker" target="_blank" rel="noopener noreferrer">Work Permit for FDW</a></li>
+          </ul>
+        </div>
+        <div>
+          <p class="sgds-footer__col-title">Contact</p>
+          <ul class="sgds-footer__links">
+            <li><a href="https://www.mom.gov.sg/contact-us" target="_blank" rel="noopener noreferrer">Contact MOM</a></li>
+            <li><a href="https://tech.gov.sg/report-vulnerability" target="_blank" rel="noopener noreferrer">Report Vulnerability</a></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="sgds-footer__bottom">
+    <div class="sgds-footer__bottom-inner">
+      <div class="sgds-footer__bottom-links">
+        <a href="https://www.mom.gov.sg/privacy-statement" target="_blank" rel="noopener noreferrer">Privacy Statement</a>
+        <a href="https://www.mom.gov.sg/terms-of-use" target="_blank" rel="noopener noreferrer">Terms of Use</a>
+        <a href="https://tech.gov.sg/report-vulnerability" target="_blank" rel="noopener noreferrer">Report Vulnerability</a>
+      </div>
+      <p class="sgds-footer__copyright">&copy; 2026 Government of Singapore. Last updated April 2026.</p>
+    </div>
+  </div>
+</footer>
 
 <script>
 /* ---------- SUS items — FDW eService wording ---------- */
