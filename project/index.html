@@ -14,8 +14,6 @@
     --line-strong: #c9c6bd;
     --accent: #2b5fa6;
     --accent-soft: #e8eef7;
-    --warn-bg: #fff7e6;
-    --warn-border: #e6c97a;
     --ok-bg: #eaf5ec;
     --ok-border: #9ec6a3;
     --radius: 6px;
@@ -42,11 +40,6 @@
   header.top.scrolled .progress-wrap { margin-top: 8px; }
   .progress-meta { display: flex; justify-content: space-between; align-items: center; font-size: 13px; color: var(--muted); margin-bottom: 6px; }
   .progress-meta .pct { font-weight: 600; color: var(--accent); font-variant-numeric: tabular-nums; }
-  .progress-track { height: 8px; background: var(--line); border-radius: 4px; overflow: hidden; }
-  .progress-fill { height: 100%; width: 0%; background: var(--accent); transition: width .3s ease; border-radius: 4px; }
-  .progress-fill.complete { background: #2c5e35; }
-
-  /* (legacy sticky-progress class — unused) */
 
   section.card { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 24px 24px 20px; margin-bottom: 22px; }
   section.card h2 { font-size: 13px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); margin: 0 0 4px; font-weight: 600; }
@@ -58,21 +51,6 @@
   .q-num { color: var(--muted); font-variant-numeric: tabular-nums; min-width: 22px; font-size: 14px; }
   .q-text { flex: 1; }
   .q-required { color: #b03030; margin-left: 4px; }
-  .q-tag {
-    display: inline-block; font-size: 11px; text-transform: uppercase; letter-spacing: .06em;
-    color: var(--muted); background: var(--accent-soft); padding: 2px 8px; border-radius: 3px;
-    margin-right: 6px; vertical-align: 1px;
-  }
-
-  .radio-group { display: flex; flex-direction: column; gap: 8px; margin-left: 32px; }
-  .radio-group label {
-    display: flex; align-items: center; gap: 10px; padding: 10px 12px;
-    border: 1px solid var(--line); border-radius: var(--radius); cursor: pointer;
-    font-size: 15px; transition: border-color .15s, background .15s;
-  }
-  .radio-group label:hover { border-color: var(--line-strong); }
-  .radio-group label:has(input:checked) { border-color: var(--accent); background: var(--accent-soft); }
-  .radio-group input[type="radio"] { accent-color: var(--accent); margin: 0; }
 
   .likert { margin-left: 32px; }
   .likert-anchors { display: flex; justify-content: space-between; font-size: 12px; color: var(--muted); margin-bottom: 6px; padding: 0 4px; }
@@ -89,22 +67,10 @@
   .likert-row label:has(input:checked) { border-color: var(--accent); background: var(--accent-soft); color: var(--ink); }
   .likert-row label:has(input:checked) .num { color: var(--accent); font-weight: 600; }
 
-  .validity-warn { display: none; margin: 12px 0 0; padding: 12px 14px; background: var(--warn-bg); border: 1px solid var(--warn-border); border-radius: var(--radius); font-size: 14px; color: #6b4c0d; }
-  .validity-warn.show { display: block; }
-
   .actions { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-top: 28px; flex-wrap: wrap; }
-  button.primary, button.secondary {
-    font: inherit; padding: 12px 22px; border-radius: var(--radius);
-    border: 1px solid var(--accent); cursor: pointer; font-weight: 500; transition: background .15s;
-  }
-  button.primary { background: var(--accent); color: #fff; }
-  button.primary:hover { background: #224b85; }
-  button.secondary { background: transparent; color: var(--accent); }
-  button.secondary:hover { background: var(--accent-soft); }
   .status-msg { font-size: 14px; color: var(--muted); }
   .status-msg.error { color: #b03030; }
 
-  /* Thank-you screen (participant only — no scores shown) */
   .thanks { display: none; text-align: center; padding: 60px 24px; }
   .thanks.show { display: block; }
   .thanks .check {
@@ -120,115 +86,21 @@
 
   body.completed #surveyHeader { display: none; }
 
-  #previewBanner.show { display: block !important; }
-
-  /* Text input fields for personal details */
-  .text-input-group input[type="text"],
-  .text-input-group input[type="email"],
-  .text-input-group input[type="tel"] {
-    width: 100%; max-width: 480px;
-    padding: 10px 12px;
-    border: 1px solid var(--line-strong);
-    border-radius: var(--radius);
-    font: inherit;
-    font-size: 15px;
-    background: var(--surface);
-    color: var(--ink);
-    transition: border-color .15s;
-  }
-  .text-input-group input:focus {
-    outline: none;
-    border-color: var(--accent);
-    box-shadow: 0 0 0 3px rgba(43,95,166,.12);
-  }
-  .text-input-group input.invalid { border-color: #b03030; }
-  .text-input-group input.invalid:focus { box-shadow: 0 0 0 3px rgba(176,48,48,.12); }
-  .field-error { font-size: 13px; color: #b03030; margin-top: 6px; min-height: 18px; }
-
-  /* SGDS-styled official government banner (fallback if web component unavailable) */
-  .sgds-masthead {
-    background: #f0f0f0;
-    border-bottom: 1px solid #d9d9d9;
-    padding: 6px 0;
-    font-size: 12px;
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
-    position: relative; z-index: 100;
-  }
-  .sgds-masthead__inner {
-    max-width: 1200px; margin: 0 auto; padding: 0 20px;
-    display: flex; align-items: center; gap: 8px;
-  }
-  .sgds-masthead__link {
-    display: flex; align-items: center; gap: 6px;
-    color: #484848; text-decoration: none;
-  }
-  .sgds-masthead__link:hover { text-decoration: underline; }
-
-  /* SGDS-styled footer */
-  .sgds-footer {
-    background: #1a1a1a; color: #d9d9d9;
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
-    font-size: 14px; margin-top: 48px;
-  }
-  .sgds-footer__top { padding: 40px 0 28px; border-bottom: 1px solid #333; }
-  .sgds-footer__inner { max-width: 1200px; margin: 0 auto; padding: 0 24px; }
-  .sgds-footer__grid { display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 32px; }
-  .sgds-footer__brand-name { color: #fff; font-size: 16px; font-weight: 600; margin: 0 0 8px; }
-  .sgds-footer__description { color: #aaa; font-size: 13px; margin: 0 0 16px; line-height: 1.5; }
-  .sgds-footer__col-title { color: #fff; font-size: 12px; text-transform: uppercase; letter-spacing: .08em; font-weight: 600; margin: 0 0 10px; }
-  .sgds-footer__links { list-style: none; margin: 0; padding: 0; }
-  .sgds-footer__links li { margin-bottom: 8px; }
-  .sgds-footer__links a { color: #aaa; text-decoration: none; font-size: 13px; }
-  .sgds-footer__links a:hover { color: #fff; text-decoration: underline; }
-  .sgds-footer__bottom { padding: 16px 0; }
-  .sgds-footer__bottom-inner {
-    max-width: 1200px; margin: 0 auto; padding: 0 24px;
-    display: flex; justify-content: space-between; align-items: center;
-    flex-wrap: wrap; gap: 12px;
-  }
-  .sgds-footer__bottom-links { display: flex; gap: 16px; flex-wrap: wrap; }
-  .sgds-footer__bottom-links a { color: #888; font-size: 12px; text-decoration: none; }
-  .sgds-footer__bottom-links a:hover { color: #fff; text-decoration: underline; }
-  .sgds-footer__copyright { color: #666; font-size: 12px; }
+  .sgds-input-wrap { margin-left: 32px; max-width: 480px; }
+  .sgds-radio-wrap { margin-left: 32px; }
 
   @media (max-width: 560px) {
     .wrap { padding: 20px 14px 60px; }
     section.card { padding: 18px 16px; }
-    .radio-group, .likert, .text-input-group { margin-left: 0; }
+    .likert, .sgds-input-wrap, .sgds-radio-wrap { margin-left: 0; }
     .likert-row label { padding: 10px 2px; font-size: 11px; }
-    .sgds-footer__grid { grid-template-columns: 1fr; gap: 24px; }
-    .sgds-footer__bottom-inner { flex-direction: column; align-items: flex-start; }
   }
 </style>
 </head>
 <body>
-<!-- SGDS Official Government Banner -->
-<!-- SGDS web component: official government banner -->
-<script src="https://cdn.jsdelivr.net/npm/@govtechsg/sgds-web-component@3.17.0/components/Masthead/index.umd.min.js" onerror="document.getElementById('sgdsMastheadFallback').style.display='block'"></script>
+<!-- SGDS web component library (full) -->
+<script src="https://cdn.jsdelivr.net/npm/@govtechsg/sgds-web-component@3.17.0"></script>
 <sgds-masthead></sgds-masthead>
-<!-- Fallback banner (shown only if the web component fails to load) -->
-<div id="sgdsMastheadFallback" class="sgds-masthead" style="display:none;">
-  <div class="sgds-masthead__inner">
-    <svg width="20" height="20" viewBox="0 0 72 60" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-      <path d="M36 0C27.8 0 21 6.8 21 15s6.8 15 15 15 15-6.8 15-15S44.2 0 36 0z" fill="#DB0000"/>
-      <path d="M0 30h72v30H0z" fill="#DB0000"/>
-      <path d="M0 0h72v30H0z" fill="#fff"/>
-    </svg>
-    <a href="https://www.gov.sg" class="sgds-masthead__link" target="_blank" rel="noopener noreferrer">
-      A Singapore Government Agency Website
-    </a>
-  </div>
-</div>
-<script>
-// If the SGDS web component fails to register, show the fallback banner.
-setTimeout(() => {
-  const el = document.querySelector('sgds-masthead');
-  if (el && el.shadowRoot == null && customElements && !customElements.get('sgds-masthead')) {
-    const fb = document.getElementById('sgdsMastheadFallback');
-    if (fb) fb.style.display = 'block';
-  }
-}, 800);
-</script>
 <div class="wrap">
 
   <header class="top" id="surveyHeader">
@@ -239,14 +111,15 @@ setTimeout(() => {
         <span id="progressLabel">0 of 13 questions answered</span>
         <span class="pct" id="progressPct">0%</span>
       </div>
-      <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
+      <sgds-progress-bar id="progressBar" label="Survey progress" ariamin="0" ariamax="100" arianow="0"></sgds-progress-bar>
     </div>
   </header>
 
-  <div id="previewBanner" style="display:none;background:var(--accent-soft);border:1px solid var(--accent);border-radius:var(--radius);padding:12px 16px;margin-bottom:18px;font-size:14px;color:var(--accent);">
-    <strong>Preview mode</strong> — you're viewing the survey questions as a researcher. Submissions are disabled and your existing response (if any) is preserved.
-    <a href="dashboard" style="color:var(--accent);float:right;">← Back to dashboard</a>
-  </div>
+  <sgds-alert id="previewBanner" variant="info" style="margin-bottom:18px;display:none;">
+    <span slot="title">Preview mode</span>
+    You're viewing the survey questions as a researcher. Submissions are disabled and your existing response (if any) is preserved.
+    <a href="dashboard" style="color:var(--accent);">← Back to dashboard</a>
+  </sgds-alert>
 
   <div class="form-screen" id="formScreen">
     <form id="susForm" novalidate>
@@ -256,36 +129,33 @@ setTimeout(() => {
         <h2>Your Details</h2>
         <p class="lead">Please provide your contact information so the research team can follow up if needed.</p>
 
-        <div class="question text-input-group" data-q="full_name">
+        <div class="question" data-q="full_name">
           <div class="q-label">
             <span class="q-num">D1.</span>
             <span class="q-text">Full name<span class="q-required">*</span></span>
           </div>
-          <div style="margin-left:32px;">
-            <input type="text" id="full_name" name="full_name" placeholder="e.g. Tan Wei Ming" autocomplete="name" />
-            <div class="field-error" id="err_full_name"></div>
+          <div class="sgds-input-wrap">
+            <sgds-input name="full_name" type="text" placeholder="e.g. Tan Wei Ming" required></sgds-input>
           </div>
         </div>
 
-        <div class="question text-input-group" data-q="email">
+        <div class="question" data-q="email">
           <div class="q-label">
             <span class="q-num">D2.</span>
             <span class="q-text">Email address<span class="q-required">*</span></span>
           </div>
-          <div style="margin-left:32px;">
-            <input type="email" id="email" name="email" placeholder="e.g. tanweiming@email.com" autocomplete="email" />
-            <div class="field-error" id="err_email"></div>
+          <div class="sgds-input-wrap">
+            <sgds-input name="email" type="email" placeholder="e.g. tanweiming@email.com" required></sgds-input>
           </div>
         </div>
 
-        <div class="question text-input-group" data-q="contact">
+        <div class="question" data-q="contact">
           <div class="q-label">
             <span class="q-num">D3.</span>
             <span class="q-text">Mobile number<span class="q-required">*</span></span>
           </div>
-          <div style="margin-left:32px;">
-            <input type="tel" id="contact" name="contact" placeholder="e.g. +65 9123 4567" autocomplete="tel" />
-            <div class="field-error" id="err_contact"></div>
+          <div class="sgds-input-wrap">
+            <sgds-input name="contact" type="tel" placeholder="e.g. +65 9123 4567" required></sgds-input>
           </div>
         </div>
       </section>
@@ -297,32 +167,39 @@ setTimeout(() => {
 
         <div class="question" data-q="residency">
           <div class="q-label"><span class="q-num">S1.</span><span class="q-text">What is your residency status?<span class="q-required">*</span></span></div>
-          <div class="radio-group">
-            <label><input type="radio" name="residency" value="Singapore Citizen" required><span>Singapore Citizen</span></label>
-            <label><input type="radio" name="residency" value="Permanent Resident"><span>Permanent Resident</span></label>
-            <label><input type="radio" name="residency" value="Foreigner (EP/SP/DP)"><span>Foreigner (EP / SP / DP)</span></label>
+          <div class="sgds-radio-wrap">
+            <sgds-radio-group name="residency" required>
+              <sgds-radio value="Singapore Citizen">Singapore Citizen</sgds-radio>
+              <sgds-radio value="Permanent Resident">Permanent Resident</sgds-radio>
+              <sgds-radio value="Foreigner (EP/SP/DP)">Foreigner (EP / SP / DP)</sgds-radio>
+            </sgds-radio-group>
           </div>
         </div>
 
         <div class="question" data-q="scheme">
           <div class="q-label"><span class="q-num">S2.</span><span class="q-text">Which application scheme did you use?<span class="q-required">*</span></span></div>
-          <div class="radio-group">
-            <label><input type="radio" name="scheme" value="Standard" required><span>Standard</span></label>
-            <label><input type="radio" name="scheme" value="Joint Income"><span>Joint Income</span></label>
-            <label><input type="radio" name="scheme" value="Sponsorship"><span>Sponsorship</span></label>
+          <div class="sgds-radio-wrap">
+            <sgds-radio-group name="scheme" required>
+              <sgds-radio value="Standard">Standard</sgds-radio>
+              <sgds-radio value="Joint Income">Joint Income</sgds-radio>
+              <sgds-radio value="Sponsorship">Sponsorship</sgds-radio>
+            </sgds-radio-group>
           </div>
         </div>
 
         <div class="question" data-q="ea">
           <div class="q-label"><span class="q-num">S3.</span><span class="q-text">Did you use an Employment Agency (EA)?<span class="q-required">*</span></span></div>
-          <div class="radio-group">
-            <label><input type="radio" name="ea" value="No (Self-Applied)" required><span>No — I self-applied</span></label>
-            <label><input type="radio" name="ea" value="Mixed"><span>Mixed — I did some, EA did some</span></label>
-            <label><input type="radio" name="ea" value="Yes (EA did it for me)"><span>Yes — the EA did it for me</span></label>
+          <div class="sgds-radio-wrap">
+            <sgds-radio-group name="ea" required>
+              <sgds-radio value="No (Self-Applied)">No — I self-applied</sgds-radio>
+              <sgds-radio value="Mixed">Mixed — I did some, EA did some</sgds-radio>
+              <sgds-radio value="Yes (EA did it for me)">Yes — the EA did it for me</sgds-radio>
+            </sgds-radio-group>
           </div>
-          <div class="validity-warn" id="eaWarn">
-            <strong>Heads up:</strong> If the EA did the application for you, you may not have interacted with the system enough to rate its usability. You can still complete the survey, but your response will be marked for the researcher's review.
-          </div>
+          <sgds-alert id="eaWarn" variant="warning" style="margin-top:12px;display:none;">
+            <span slot="title">Heads up</span>
+            If the EA did the application for you, you may not have interacted with the system enough to rate its usability. You can still complete the survey, but your response will be marked for the researcher's review.
+          </sgds-alert>
         </div>
       </section>
 
@@ -335,7 +212,7 @@ setTimeout(() => {
 
       <div class="actions">
         <div class="status-msg" id="statusMsg">All questions are required.</div>
-        <button type="submit" class="primary" id="submitBtn">Submit response</button>
+        <sgds-button variant="primary" id="submitBtn">Submit response</sgds-button>
       </div>
     </form>
   </div>
@@ -360,45 +237,35 @@ setTimeout(() => {
 
 </div>
 
-<!-- SGDS Footer -->
-<footer class="sgds-footer" role="contentinfo">
-  <div class="sgds-footer__top">
-    <div class="sgds-footer__inner">
-      <div class="sgds-footer__grid">
-        <div>
-          <p class="sgds-footer__brand-name">Ministry of Manpower</p>
-          <p class="sgds-footer__description">FDW eService — Work Permit transactions for domestic helpers and confinement nannies. This survey is conducted to improve the usability of the service.</p>
-        </div>
-        <div>
-          <p class="sgds-footer__col-title">Useful Links</p>
-          <ul class="sgds-footer__links">
-            <li><a href="https://www.mom.gov.sg" target="_blank" rel="noopener noreferrer">MOM Website</a></li>
-            <li><a href="https://www.mom.gov.sg/passes-and-permits/work-permit-for-foreign-domestic-worker" target="_blank" rel="noopener noreferrer">Work Permit for FDW</a></li>
-          </ul>
-        </div>
-        <div>
-          <p class="sgds-footer__col-title">Contact</p>
-          <ul class="sgds-footer__links">
-            <li><a href="https://www.mom.gov.sg/contact-us" target="_blank" rel="noopener noreferrer">Contact MOM</a></li>
-            <li><a href="https://tech.gov.sg/report-vulnerability" target="_blank" rel="noopener noreferrer">Report Vulnerability</a></li>
-          </ul>
-        </div>
-      </div>
-    </div>
-  </div>
-  <div class="sgds-footer__bottom">
-    <div class="sgds-footer__bottom-inner">
-      <div class="sgds-footer__bottom-links">
-        <a href="https://www.mom.gov.sg/privacy-statement" target="_blank" rel="noopener noreferrer">Privacy Statement</a>
-        <a href="https://www.mom.gov.sg/terms-of-use" target="_blank" rel="noopener noreferrer">Terms of Use</a>
-        <a href="https://tech.gov.sg/report-vulnerability" target="_blank" rel="noopener noreferrer">Report Vulnerability</a>
-      </div>
-      <p class="sgds-footer__copyright">&copy; 2026 Government of Singapore. Last updated April 2026.</p>
-    </div>
-  </div>
-</footer>
+<!-- SGDS Footer (links set via JS below) -->
+<sgds-footer
+  title="Ministry of Manpower"
+  description="FDW eService — Work Permit transactions for domestic helpers and confinement nannies. This survey is conducted to improve the usability of the service."
+  lastUpdatedDate="April 2026"
+></sgds-footer>
 
 <script>
+/* ---------- Configure SGDS Footer links ---------- */
+const sgdsFooter = document.querySelector('sgds-footer');
+if (sgdsFooter) {
+  sgdsFooter.links = [
+    {
+      title: "Useful Links",
+      links: [
+        { href: "https://www.mom.gov.sg", label: "MOM Website" },
+        { href: "https://www.mom.gov.sg/passes-and-permits/work-permit-for-foreign-domestic-worker", label: "Work Permit for FDW" }
+      ]
+    },
+    {
+      title: "Contact",
+      links: [
+        { href: "https://www.mom.gov.sg/contact-us", label: "Contact MOM" },
+        { href: "https://tech.gov.sg/report-vulnerability", label: "Report Vulnerability" }
+      ]
+    }
+  ];
+}
+
 /* ---------- SUS items — FDW eService wording ---------- */
 const SYSTEM_NAME = "Work Permit transactions for domestic helpers and confinement nannies (FDW eService)";
 const SUS_ITEMS = [
@@ -415,7 +282,7 @@ const SUS_ITEMS = [
 ];
 const ANCHORS = ["Strongly disagree", "Disagree", "Neutral", "Agree", "Strongly agree"];
 
-/* Render */
+/* Render SUS items with sgds-badge dimension tags */
 const susContainer = document.getElementById('susItems');
 SUS_ITEMS.forEach(item => {
   const div = document.createElement('div');
@@ -424,7 +291,10 @@ SUS_ITEMS.forEach(item => {
   div.innerHTML = `
     <div class="q-label">
       <span class="q-num">${item.id}.</span>
-      <span class="q-text">${item.text}<span class="q-required">*</span></span>
+      <span class="q-text">
+        <sgds-badge variant="info">${item.dim}</sgds-badge>
+        ${item.text}<span class="q-required">*</span>
+      </span>
     </div>
     <div class="likert">
       <div class="likert-anchors"><span>${ANCHORS[0]}</span><span>${ANCHORS[4]}</span></div>
@@ -442,26 +312,30 @@ SUS_ITEMS.forEach(item => {
 });
 
 /* Progress */
-const RADIO_NAMES = ['residency','scheme','ea', ...SUS_ITEMS.map(i => `sus${i.id}`)];
-const TEXT_NAMES = ['full_name','email','contact'];
+const SCREENER_RADIO_NAMES = ['residency', 'scheme', 'ea'];
+const LIKERT_RADIO_NAMES = SUS_ITEMS.map(i => `sus${i.id}`);
+const RADIO_NAMES = [...SCREENER_RADIO_NAMES, ...LIKERT_RADIO_NAMES];
+const TEXT_NAMES = ['full_name', 'email', 'contact'];
 const REQUIRED_NAMES = [...TEXT_NAMES, ...RADIO_NAMES];
-const progressFill = document.getElementById('progressFill');
+const progressBar = document.getElementById('progressBar');
 
 /* Validators — light-touch, allow international formats */
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const PHONE_RE = /^[+\d][\d\s\-()]{6,}$/;
 function isFieldFilled(name) {
-  const form = document.getElementById('susForm');
-  if (RADIO_NAMES.includes(name)) {
-    return !!form.querySelector(`input[name="${name}"]:checked`);
+  if (SCREENER_RADIO_NAMES.includes(name)) {
+    const rg = document.querySelector(`sgds-radio-group[name="${name}"]`);
+    return rg && !!rg.value;
   }
-  // Text inputs — must be valid, not just non-empty
-  const el = form.querySelector(`input[name="${name}"]`);
+  if (LIKERT_RADIO_NAMES.includes(name)) {
+    return !!document.querySelector(`input[name="${name}"]:checked`);
+  }
+  const el = document.querySelector(`sgds-input[name="${name}"]`);
   if (!el) return false;
-  const v = el.value.trim();
+  const v = (el.value || '').trim();
   if (!v) return false;
   if (name === 'email') return EMAIL_RE.test(v);
-  if (name === 'contact') return PHONE_RE.test(v) && v.replace(/\D/g,'').length >= 7;
+  if (name === 'contact') return PHONE_RE.test(v) && v.replace(/\D/g, '').length >= 7;
   if (name === 'full_name') return v.length >= 2;
   return true;
 }
@@ -471,50 +345,59 @@ function updateProgress() {
   REQUIRED_NAMES.forEach(n => { if (isFieldFilled(n)) answered++; });
   const total = REQUIRED_NAMES.length;
   const pct = Math.round((answered / total) * 100);
-  progressFill.style.width = pct + '%';
+  progressBar.setAttribute('arianow', String(pct));
   document.getElementById('progressPct').textContent = pct + '%';
   document.getElementById('progressLabel').textContent =
     answered === total
       ? `All ${total} questions answered — ready to submit`
       : `${answered} of ${total} questions answered`;
-  progressFill.classList.toggle('complete', answered === total);
   const sm = document.getElementById('statusMsg');
   if (answered === total) { sm.textContent = 'Ready to submit.'; sm.classList.remove('error'); }
-  else { sm.textContent = `${total - answered} question${total-answered===1?'':'s'} remaining.`; sm.classList.remove('error'); }
+  else { sm.textContent = `${total - answered} question${total - answered === 1 ? '' : 's'} remaining.`; sm.classList.remove('error'); }
 }
 
-/* Inline validation for text fields on blur */
+/* Inline validation for SGDS text inputs */
 TEXT_NAMES.forEach(name => {
-  const el = document.getElementById(name);
-  const errEl = document.getElementById('err_' + name);
-  if (!el || !errEl) return;
+  const el = document.querySelector(`sgds-input[name="${name}"]`);
+  if (!el) return;
   const validate = () => {
-    const v = el.value.trim();
+    const v = (el.value || '').trim();
     let msg = '';
     if (!v) msg = 'This field is required.';
     else if (name === 'email' && !EMAIL_RE.test(v)) msg = 'Please enter a valid email address.';
-    else if (name === 'contact' && (!PHONE_RE.test(v) || v.replace(/\D/g,'').length < 7)) msg = 'Please enter a valid phone number.';
+    else if (name === 'contact' && (!PHONE_RE.test(v) || v.replace(/\D/g, '').length < 7)) msg = 'Please enter a valid phone number.';
     else if (name === 'full_name' && v.length < 2) msg = 'Please enter your full name.';
-    errEl.textContent = msg;
-    el.classList.toggle('invalid', !!msg);
+    el.invalidFeedback = msg;
+    if (typeof el.setInvalid === 'function') el.setInvalid(!!msg);
     return !msg;
   };
-  el.addEventListener('blur', validate);
-  el.addEventListener('input', () => {
-    // Clear errors live as the user types, but don't add new errors until blur
-    if (el.classList.contains('invalid')) validate();
+  el.addEventListener('sgds-change', validate);
+  el.addEventListener('sgds-input', () => {
+    if (el.invalid) validate();
     updateProgress();
   });
 });
 
+/* Screener radio change listeners (sgds-radio-group) */
+SCREENER_RADIO_NAMES.forEach(name => {
+  const rg = document.querySelector(`sgds-radio-group[name="${name}"]`);
+  if (!rg) return;
+  rg.addEventListener('sgds-change', () => {
+    updateProgress();
+    if (name === 'ea') {
+      const warn = document.getElementById('eaWarn');
+      warn.style.display = rg.value === 'Yes (EA did it for me)' ? '' : 'none';
+    }
+  });
+});
+
+/* Likert (native radio) change listeners */
 document.getElementById('susForm').addEventListener('change', (e) => {
-  updateProgress();
-  if (e.target.name === 'ea') {
-    const warn = document.getElementById('eaWarn');
-    if (e.target.value === 'Yes (EA did it for me)') warn.classList.add('show');
-    else warn.classList.remove('show');
+  if (e.target.type === 'radio' && LIKERT_RADIO_NAMES.includes(e.target.name)) {
+    updateProgress();
   }
 });
+
 updateProgress();
 
 /* Compact header on scroll */
@@ -547,7 +430,6 @@ async function saveResponse(record) {
       return { ok: false, error: err.error || 'server_error' };
     }
     const result = await response.json();
-    // Mark as submitted locally (prevent duplicate submissions from same browser)
     localStorage.setItem(SUBMITTED_KEY, new Date().toISOString());
     return { ok: true, id: result.id };
   } catch (err) {
@@ -556,32 +438,53 @@ async function saveResponse(record) {
   }
 }
 
-/* Submit */
-document.getElementById('susForm').addEventListener('submit', async (e) => {
+/* Prevent native form submission (web components don't trigger it, but guard anyway) */
+document.getElementById('susForm').addEventListener('submit', (e) => {
   e.preventDefault();
+});
+
+/* Submit via sgds-button click */
+document.getElementById('submitBtn').addEventListener('click', async () => {
   if (isPreviewMode) {
     alert('Preview mode: submissions are disabled. Open the survey without ?preview=1 to record a real response.');
     return;
   }
-  const form = e.currentTarget;
-  const data = new FormData(form);
+
+  const responses = {};
+  TEXT_NAMES.forEach(n => {
+    const el = document.querySelector(`sgds-input[name="${n}"]`);
+    responses[n] = el ? (el.value || '').trim() : '';
+  });
+  SCREENER_RADIO_NAMES.forEach(n => {
+    const rg = document.querySelector(`sgds-radio-group[name="${n}"]`);
+    responses[n] = rg ? (rg.value || '') : '';
+  });
+  LIKERT_RADIO_NAMES.forEach(n => {
+    const checked = document.querySelector(`input[name="${n}"]:checked`);
+    responses[n] = checked ? checked.value : '';
+  });
+
   const missing = REQUIRED_NAMES.filter(n => !isFieldFilled(n));
   if (missing.length) {
     const sm = document.getElementById('statusMsg');
     sm.textContent = `Please complete all required fields (${missing.length} remaining).`;
     sm.classList.add('error');
-    // Trigger inline error display for missing text fields
     missing.filter(n => TEXT_NAMES.includes(n)).forEach(n => {
-      const el = document.getElementById(n);
-      if (el) el.dispatchEvent(new Event('blur'));
+      const el = document.querySelector(`sgds-input[name="${n}"]`);
+      if (el) {
+        const v = (el.value || '').trim();
+        let msg = 'This field is required.';
+        if (v && n === 'email' && !EMAIL_RE.test(v)) msg = 'Please enter a valid email address.';
+        else if (v && n === 'contact' && (!PHONE_RE.test(v) || v.replace(/\D/g, '').length < 7)) msg = 'Please enter a valid phone number.';
+        else if (v && n === 'full_name' && v.length < 2) msg = 'Please enter your full name.';
+        el.invalidFeedback = msg;
+        if (typeof el.setInvalid === 'function') el.setInvalid(true);
+      }
     });
-    const firstMissingEl = form.querySelector(`[data-q="${missing[0]}"]`);
-    if (firstMissingEl) firstMissingEl.scrollIntoView({behavior:'smooth', block:'center'});
+    const firstMissingEl = document.querySelector(`[data-q="${missing[0]}"]`);
+    if (firstMissingEl) firstMissingEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
     return;
   }
-  const responses = {};
-  RADIO_NAMES.forEach(n => responses[n] = data.get(n));
-  TEXT_NAMES.forEach(n => responses[n] = (data.get(n) || '').toString().trim());
 
   const record = {
     contact_info: {
@@ -613,18 +516,27 @@ document.getElementById('susForm').addEventListener('submit', async (e) => {
   document.getElementById('formScreen').classList.add('hidden');
   document.getElementById('thanksScreen').classList.add('show');
   document.body.classList.add('completed');
-  window.scrollTo({top:0, behavior:'smooth'});
+  window.scrollTo({ top: 0, behavior: 'smooth' });
 });
 
 /* Restart */
 const restartBtn = document.getElementById('restartBtn');
-if (restartBtn) restartBtn.addEventListener('click', () => {  document.getElementById('susForm').reset();
-  document.getElementById('eaWarn').classList.remove('show');
+if (restartBtn) restartBtn.addEventListener('click', () => {
+  document.getElementById('susForm').reset();
+  document.getElementById('eaWarn').style.display = 'none';
+  TEXT_NAMES.forEach(n => {
+    const el = document.querySelector(`sgds-input[name="${n}"]`);
+    if (el) { el.value = ''; if (typeof el.setInvalid === 'function') el.setInvalid(false); }
+  });
+  SCREENER_RADIO_NAMES.forEach(n => {
+    const rg = document.querySelector(`sgds-radio-group[name="${n}"]`);
+    if (rg) rg.value = '';
+  });
   document.getElementById('formScreen').classList.remove('hidden');
   document.getElementById('thanksScreen').classList.remove('show');
   document.body.classList.remove('completed');
   updateProgress();
-  window.scrollTo({top:0, behavior:'smooth'});
+  window.scrollTo({ top: 0, behavior: 'smooth' });
 });
 
 /* One response per browser — check on load (skip in preview mode) */
@@ -635,7 +547,8 @@ if (localStorage.getItem(SUBMITTED_KEY) && !isPreviewMode) {
   document.body.classList.add('completed');
 }
 if (isPreviewMode) {
-  document.getElementById('previewBanner').classList.add('show');
+  const pb = document.getElementById('previewBanner');
+  if (pb) pb.style.display = '';
 }
 </script>
 </body>
