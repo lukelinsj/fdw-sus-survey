@@ -1,5 +1,4 @@
 {
-  "outputDirectory": "project",
   "cleanUrls": true,
   "trailingSlash": false,
   "headers": [
