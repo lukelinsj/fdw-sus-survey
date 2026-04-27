@@ -244,8 +244,10 @@
 </head>
 <body>
 <!-- SGDS Official Government Banner -->
-<!-- Static SGDS-styled masthead (offline-friendly; no external dependencies) -->
-<div class="sgds-masthead">
+<!-- Official web component (matches SGDS design); fallback banner appears if this fails to load. -->
+<script type="module" src="https://cdn.jsdelivr.net/npm/@govtechsg/sgds-web-component@3.8.1/components/Masthead/index.umd.js" onerror="document.getElementById('sgdsMastheadFallback').style.display='block'"></script>
+<sgds-masthead></sgds-masthead>
+<div id="sgdsMastheadFallback" class="sgds-masthead" style="display:none;">
   <div class="sgds-masthead__inner">
     <svg width="20" height="20" viewBox="0 0 72 60" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
       <path d="M36 0C27.8 0 21 6.8 21 15s6.8 15 15 15 15-6.8 15-15S44.2 0 36 0z" fill="#DB0000"/>
